@@ -44,20 +44,25 @@ async def get_food(message: Message, state: FSMContext):
 
     if message.text == "submit":
         await message.answer(f"Стол {order['table_id']} \nВыбрано: {foods}")
+        await message.bot.send_message(
+            -4650814133,
+            text=f"Стол {order['table_id']} \nВыбрано: {foods}",
+            parse_mode=ParseMode.HTML
+        )
         await insert_order(order["table_id"], foods)
         await state.clear()
-
-    food = message.text
-    if isinstance(foods, dict):
-        foods[food] = 0
     else:
-        foods = {food: 0}
+        food = message.text
+        if isinstance(foods, dict):
+            foods[food] = 0
+        else:
+            foods = {food: 0}
 
-    await state.update_data(order_foods=foods)
-    await state.update_data(food=food)
+        await state.update_data(order_foods=foods)
+        await state.update_data(food=food)
 
-    await message.answer(text=f"Выберите количество: \nВыбрано: {foods}")
-    await state.set_state(OrderForm.count)
+        await message.answer(text=f"Выберите количество: \nВыбрано: {foods}")
+        await state.set_state(OrderForm.count)
 
 
 @router.message(F.text, OrderForm.count)
@@ -67,9 +72,9 @@ async def get_count(message: Message, state: FSMContext):
 
     if message.text.isnumeric():
         foods[order["food"]] = int(message.text)
+        await state.update_data(order_foods=foods)
+        await message.answer(text=f"Выберите блюда: \nВыбрано: {foods}")
+        await state.set_state(OrderForm.food)
     else:
         await message.answer("Введите число")
 
-    await state.update_data(order_foods=foods)
-    await message.answer(text=f"Выберите блюда: \nВыбрано: {foods}")
-    await state.set_state(OrderForm.food)
