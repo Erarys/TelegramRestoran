@@ -29,7 +29,7 @@ class OrderForm(StatesGroup):
 
 
 
-@router.message(Command("cancel"), OrderForm())
+@router.message(Command("Отменить"), OrderForm())
 async def cancel_adding_goods(message: Message, state: FSMContext):
     await message.answer("Отменено ❎")
     await state.clear()
@@ -54,12 +54,12 @@ async def get_food(message: Message, state: FSMContext):
     order = await state.get_data()
     foods = order.get("order_foods")
 
-    if message.text == "submit":
-        await message.answer(f"Стол {order['table_id']} \nВыбрано: {foods}")
+    if message.text == "Сохранить":
+        order_text = "".join(f"{k}: {v}\n" for k, v in foods.items())
+        await message.answer(f"Стол {order['table_id']}\n{order_text}", reply_markup=None)
         await message.bot.send_message(
             -4650814133,
-            text=f"Стол {order['table_id']} \nВыбрано: {foods}",
-            parse_mode=ParseMode.HTML
+            text=f"Стол {order['table_id']}\n{order_text}"
         )
         await insert_order(order["table_id"], foods)
         await state.clear()
@@ -72,8 +72,8 @@ async def get_food(message: Message, state: FSMContext):
 
         await state.update_data(order_foods=foods)
         await state.update_data(food=food)
-
-        await message.answer(text=f"Выберите количество: \nВыбрано: {foods}", reply_markup=get_count_button())
+        order_text = "".join(f"{k}: {v}\n" for k, v in foods.items())
+        await message.answer(text=f"Стол {order['table_id']}\n{order_text}", reply_markup=get_count_button())
         await state.set_state(OrderForm.count)
 
 
@@ -84,8 +84,9 @@ async def get_count(message: Message, state: FSMContext):
 
     if message.text.isnumeric():
         foods[order["food"]] = int(message.text)
+        order_text = "".join(f"{k}: {v}\n" for k, v in foods.items())
         await state.update_data(order_foods=foods)
-        await message.answer(text=f"Выберите блюда: \nВыбрано: {foods}", reply_markup=get_order_button())
+        await message.answer(text=f"Стол {order['table_id']}\n{order_text}", reply_markup=get_order_button())
         await state.set_state(OrderForm.food)
     else:
         await message.answer("Введите число")

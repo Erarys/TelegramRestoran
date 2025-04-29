@@ -18,8 +18,8 @@ def get_order_button():
         "Утка Шашлык",
         "Кока Кола 2л",
         "Чипсы",
-        "submit",
-        "/cancel"
+        "Сохранить",
+        "/Отменить"
     ]
     for food in foods_menu:
         builder.add(KeyboardButton(text=str(food)))
