@@ -28,22 +28,6 @@ class OrderForm(StatesGroup):
     order_foods: dict = State()
 
 
-@router.message(Command("test"))
-async def test(message: Message):
-    await fill_table()
-    await fill_menu()
-    await message.answer("Its working..")
-
-
-@router.message(Command("test2"))
-async def test(message: Message):
-    table_id = 1
-    foods = {
-        "Баранина Шашлык": 3
-    }
-    await insert_order(table_id, foods)
-    await message.answer("Its working..")
-
 
 @router.message(Command("cancel"), OrderForm())
 async def cancel_adding_goods(message: Message, state: FSMContext):
