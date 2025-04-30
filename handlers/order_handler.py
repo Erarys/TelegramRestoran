@@ -10,7 +10,7 @@ from aiogram.fsm.state import State, StatesGroup
 from db.queries.orm import (
     insert_order,
     fill_table,
-    fill_menu
+    fill_menu, check_free_table, check_free_table2
 )
 from keyboards.order_keyboard import (
     get_table_button,
@@ -44,9 +44,16 @@ async def start(message: Message, state: FSMContext):
 
 @router.message(F.text, OrderForm.table_id)
 async def get_table_id(message: Message, state: FSMContext):
-    await state.update_data(table_id=message.text)
-    await message.answer(text="Выберите меню:", reply_markup=get_order_button())
-    await state.set_state(OrderForm.food)
+    if not await check_free_table(message.text):
+        text = await check_free_table2(message.text)
+
+        # for food in result:
+        #     print("era", food.food, food.count, food.price_per_unit)
+        await message.answer(text=f"Стол занят\n{text}", reply_markup=get_table_button())
+    else:
+        await state.update_data(table_id=message.text)
+        await message.answer(text="Выберите меню:", reply_markup=get_order_button())
+        await state.set_state(OrderForm.food)
 
 
 @router.message(F.text, OrderForm.food)

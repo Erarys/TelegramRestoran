@@ -1,4 +1,4 @@
-from sqlalchemy import select, and_, delete, func
+from sqlalchemy import select, and_, delete, func, desc
 from db.database import engine, Base, factory_session
 from db.models import OrderFoodORM, FoodsORM, MenuORM, TableORM
 from typing import List
@@ -22,7 +22,6 @@ async def create_table():
 #             session.commit()
 
 async def insert_order(table_id, foods: dict):
-
     with factory_session() as session:
         with session.begin():
             table = session.query(TableORM).filter_by(number=table_id).first()
@@ -38,6 +37,20 @@ async def insert_order(table_id, foods: dict):
                 session.commit()
 
 
+async def check_free_table(table_id):
+    with factory_session() as session:
+        with session.begin():
+            table = session.query(TableORM).filter_by(number=table_id).first()
+            return table.is_available
+
+async def check_free_table2(table_id):
+    with factory_session() as session:
+        with session.begin():
+            table = session.query(TableORM).filter_by(number=table_id).first()
+            order = session.query(OrderFoodORM).filter_by(table=table).first()
+
+            text = "\n".join(f"{food.food} {food.count} {food.price_per_unit}" for food in order.foods)
+            return text
 
 async def fill_menu():
     with factory_session() as session:
