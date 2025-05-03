@@ -8,18 +8,6 @@ async def create_table():
     # Создаем все таблицы наследованные из класса Base
     Base.metadata.create_all(engine)
 
-# async def insert_order(table_id, foods: dict):
-#     with factory_session() as session:
-#         with session.begin():
-#             order = OrderFoodORM(
-#                 table_id=int(table_id),
-#             )
-#             order.foods = [
-#                 FoodsORM(food=food, count=count) for food, count in foods.items()
-#             ]
-#
-#             session.add(order)
-#             session.commit()
 
 async def insert_order(table_id, foods: dict):
     with factory_session() as session:
@@ -31,7 +19,8 @@ async def insert_order(table_id, foods: dict):
 
                 foods_objects = [session.query(MenuORM).filter_by(food_name=food).first() for food in foods.keys()]
                 order.foods = [
-                    FoodsORM(food=food_object.food_name, price_per_unit=food_object.price, count=count) for food_object, count in zip(foods_objects, foods.values())
+                    FoodsORM(food=food_object.food_name, price_per_unit=food_object.price, count=count) for
+                    food_object, count in zip(foods_objects, foods.values())
                 ]
                 session.add(order)
                 session.commit()
@@ -43,14 +32,45 @@ async def check_free_table(table_id):
             table = session.query(TableORM).filter_by(number=table_id).first()
             return table.is_available
 
-async def check_free_table2(table_id):
+async def clear_table(table_id):
     with factory_session() as session:
         with session.begin():
             table = session.query(TableORM).filter_by(number=table_id).first()
-            order = session.query(OrderFoodORM).filter_by(table=table).first()
+            if not table.is_available:
+                table.is_available = True
 
+async def get_table_foods(table_id):
+    with factory_session() as session:
+        with session.begin():
+            table = session.query(TableORM).filter_by(number=table_id).first()
+            order = (
+                session.query(OrderFoodORM)
+                .filter_by(table=table)
+                .order_by(desc(OrderFoodORM.created_at))
+                .first()
+            )
+
+            return {food.food: food.count for food in order.foods}
+
+async def get_table_order(table_id):
+    with factory_session() as session:
+        with session.begin():
+            table = session.query(TableORM).filter_by(number=table_id).first()
+            order = (
+                session.query(OrderFoodORM)
+                .filter_by(table=table)
+                .order_by(desc(OrderFoodORM.created_at))
+                .first()
+            )
+
+            full_price = 0
+
+            for food in order.foods:
+                full_price += food.price_per_unit * food.count
             text = "\n".join(f"{food.food} {food.count} {food.price_per_unit}" for food in order.foods)
+            text += f"\nИтого: {full_price}"
             return text
+
 
 async def fill_menu():
     with factory_session() as session:
@@ -65,6 +85,7 @@ async def fill_menu():
                 food = MenuORM(food_name=name, price=price)
                 session.add(food)
             session.commit()
+
 
 async def fill_table():
     with factory_session() as session:
