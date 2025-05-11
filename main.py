@@ -19,6 +19,8 @@ async def main():
     :return:
     """
     bot = Bot(token=os.getenv("TOKEN"))
+
+
     dp = Dispatcher(storage=storage)
     dp.include_router(order_handler.router)
     # Base.metadata.drop_all(bind=engine)  # Удаляет все таблицы

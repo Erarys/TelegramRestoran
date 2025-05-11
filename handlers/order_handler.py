@@ -1,5 +1,8 @@
+from contextlib import suppress
+
 from aiogram import Router, F
 from aiogram.enums import ParseMode
+from aiogram.exceptions import TelegramBadRequest
 from aiogram.filters import CommandStart, Command
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, ReplyKeyboardRemove, CallbackQuery
@@ -10,13 +13,22 @@ from aiogram.fsm.state import State, StatesGroup
 from db.queries.orm import (
     insert_order,
     fill_table,
-    fill_menu, check_free_table, get_table_order, clear_table, get_table_foods
+    fill_menu,
+    check_free_table,
+    get_table_order,
+    clear_table,
+    get_table_foods
 )
 from keyboards.order_keyboard import (
     get_table_button,
     get_order_button,
-    get_count_button, get_bill_button, TableCallback, ready_order, EditOrderStatusCallback, get_keyboard_fab
+    get_count_button,
+    get_bill_button,
+    TableCallback,
+    EditOrderStatusCallback,
+    ready_order
 )
+import re
 
 router = Router()
 
@@ -58,10 +70,19 @@ async def table_callback(callback: CallbackQuery, callback_data: TableCallback, 
 
 @router.callback_query(EditOrderStatusCallback.filter())
 async def edit_order_status(callback: CallbackQuery, callback_data: EditOrderStatusCallback, state: FSMContext):
-    await callback.message.edit_text("Статус заказа: Активный", reply_markup=get_keyboard_fab())
+    old_text = callback.message.text
+    print(old_text)
 
+    with suppress(TelegramBadRequest):
+        if callback_data.status == "Готов":
+            await callback.message.bot.send_message(
+                1833531133,
+                text=old_text
+            )
 
-    await callback.answer()
+        new_text = re.sub(r'Статус заказа: .*$', f'Статус заказа: {callback_data.status}', old_text)
+        await callback.message.edit_text(new_text, reply_markup=ready_order())
+        await callback.answer()
 
 
 @router.message(F.text, OrderForm.table_id)

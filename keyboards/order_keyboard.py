@@ -71,41 +71,18 @@ def get_bill_button(table_id) -> InlineKeyboardButton:
 
     return keyboard
 
-def ready_order() -> InlineKeyboardButton:
-    buttons = [
-            [
-                InlineKeyboardButton(
-                    text="☑️ Заказ Готов",
-                    callback_data=EditOrderStatusCallback(status="active").pack()
-                ),
-                InlineKeyboardButton(
-                    text="🚫 Заказ Не готов",
-                    callback_data=EditOrderStatusCallback(status="passive").pack()
-                ),
-            ],
-            [
-                InlineKeyboardButton(
-                    text="💤 Заказ выполнен",
-                    callback_data=EditOrderStatusCallback(status="deactivate").pack()
-                ),
-            ]
-        ]
-
-    keyboard = InlineKeyboardMarkup(inline_keyboard=buttons)
-
-    return keyboard
 
 
-def get_keyboard_fab():
+def ready_order():
     builder = InlineKeyboardBuilder()
     builder.button(
-        text="☑️ Заказ Готов", callback_data=EditOrderStatusCallback(status="activate")
+        text="☑️ Заказ Готов", callback_data=EditOrderStatusCallback(status="Готов")
     )
     builder.button(
-        text="-1", callback_data=EditOrderStatusCallback(status="passive")
+        text="🚫 Заказ Не готов", callback_data=EditOrderStatusCallback(status="Не готов")
     )
     builder.button(
-        text="+1", callback_data=EditOrderStatusCallback(status="deactivate")
+        text="💤 Заказ выполнен", callback_data=EditOrderStatusCallback(status="Заказ выполнен")
     )
 
     # Выравниваем кнопки по 4 в ряд, чтобы получилось 4 + 1
