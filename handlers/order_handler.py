@@ -1,7 +1,7 @@
 from aiogram import Router, F
 from aiogram.filters import CommandStart, Command
 from aiogram.fsm.context import FSMContext
-from aiogram.types import Message, CallbackQuery, ReplyKeyboardRemove
+from aiogram.types import Message, CallbackQuery
 
 from aiogram.fsm.state import State, StatesGroup
 
@@ -12,6 +12,7 @@ from db.queries.orm import (
     clear_table,
     get_table_foods
 )
+from filters.base_filters import ChatTypeFilter
 from keyboards.order_keyboard import (
     get_table_button,
     get_order_button,
@@ -22,6 +23,8 @@ from keyboards.order_keyboard import (
 )
 
 router = Router()
+
+router.message.filter(ChatTypeFilter(chat_type=["private"]))
 
 
 class OrderForm(StatesGroup):
@@ -93,7 +96,7 @@ async def handle_food_selection(message: Message, state: FSMContext):
         await message.answer(order_text, reply_markup=get_table_button())
         await message.bot.send_message(
             -4650814133,
-            text=f"{order_text}\nСтатус заказа: Активный",
+            text=f"{order_text}\nСтатус заказа: Не готов",
             reply_markup=ready_order()
         )
         await process_table_order(table_id, foods)
