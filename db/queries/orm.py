@@ -9,21 +9,37 @@ async def create_table():
     Base.metadata.create_all(engine)
 
 
-async def insert_order(table_id, foods: dict):
+
+async def process_table_order(table_id, foods: dict):
+    """
+    Создаёт или обновляет заказ для указанного стола.
+    :param table_id: номер стола
+    :param foods: словарь с названием блюда и количеством
+    """
     with factory_session() as session:
         with session.begin():
             table = session.query(TableORM).filter_by(number=table_id).first()
+            if not table:
+                raise ValueError(f"Table with id {table_id} not found")
+
+            # Получаем блюда из меню
+            foods_objects = [
+                session.query(MenuORM).filter_by(food_name=food).first() for food in foods.keys()
+            ]
+
+            food_entries = [
+                FoodsORM(food=food_object.food_name, price_per_unit=food_object.price, count=count)
+                for food_object, count in zip(foods_objects, foods.values()) if food_object
+            ]
+
+            order = OrderFoodORM(table=table)
+            order.foods.extend(food_entries)
+            session.add(order)
+
             if table.is_available:
                 table.is_available = False
-                order = OrderFoodORM(table=table)
 
-                foods_objects = [session.query(MenuORM).filter_by(food_name=food).first() for food in foods.keys()]
-                order.foods = [
-                    FoodsORM(food=food_object.food_name, price_per_unit=food_object.price, count=count) for
-                    food_object, count in zip(foods_objects, foods.values())
-                ]
-                session.add(order)
-                session.commit()
+            session.commit()
 
 
 async def check_free_table(table_id):
@@ -32,12 +48,14 @@ async def check_free_table(table_id):
             table = session.query(TableORM).filter_by(number=table_id).first()
             return table.is_available
 
+
 async def clear_table(table_id):
     with factory_session() as session:
         with session.begin():
             table = session.query(TableORM).filter_by(number=table_id).first()
             if not table.is_available:
                 table.is_available = True
+
 
 async def get_table_foods(table_id):
     with factory_session() as session:
@@ -51,6 +69,7 @@ async def get_table_foods(table_id):
             )
 
             return {food.food: food.count for food in order.foods}
+
 
 async def get_table_order(table_id):
     with factory_session() as session:

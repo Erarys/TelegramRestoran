@@ -3,7 +3,7 @@ from aiogram.fsm.storage.redis import RedisStorage
 
 from db.database import Base, engine
 from db.queries.orm import create_table
-from handlers import order_handler
+from handlers import order_handler, order_for_cook
 
 import os
 import asyncio
@@ -23,6 +23,7 @@ async def main():
 
     dp = Dispatcher(storage=storage)
     dp.include_router(order_handler.router)
+    dp.include_router(order_for_cook.router)
     # Base.metadata.drop_all(bind=engine)  # Удаляет все таблицы
     # Base.metadata.create_all(bind=engine)  # Создает их заново по моделям
     await create_table()

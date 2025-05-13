@@ -48,7 +48,7 @@ def get_count_button():
 
     return builder.as_markup()
 
-def get_bill_button(table_id) -> InlineKeyboardButton:
+def get_order_option_button(table_id) -> InlineKeyboardButton:
     buttons = [
         [
             InlineKeyboardButton(
