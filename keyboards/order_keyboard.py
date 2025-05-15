@@ -9,8 +9,11 @@ class TableCallback(CallbackData, prefix="table"):
     action: str
     table_id: str
 
+
 class EditOrderStatusCallback(CallbackData, prefix="edit_status"):
     status: str
+    order_creator_id: int
+
 
 def get_table_button():
     builder = ReplyKeyboardBuilder()
@@ -21,6 +24,7 @@ def get_table_button():
     builder.adjust(3)
 
     return builder.as_markup()
+
 
 def get_order_button():
     builder = ReplyKeyboardBuilder()
@@ -38,6 +42,7 @@ def get_order_button():
     builder.adjust(3)
     return builder.as_markup()
 
+
 def get_count_button():
     builder = ReplyKeyboardBuilder()
 
@@ -47,6 +52,7 @@ def get_count_button():
     builder.adjust(3)
 
     return builder.as_markup()
+
 
 def get_order_option_button(table_id) -> InlineKeyboardButton:
     buttons = [
@@ -72,17 +78,22 @@ def get_order_option_button(table_id) -> InlineKeyboardButton:
     return keyboard
 
 
-
-def ready_order():
+def get_order_status_keyboard(order_creator_id: int):
     builder = InlineKeyboardBuilder()
     builder.button(
-        text="☑️ Заказ Готов", callback_data=EditOrderStatusCallback(status="Готов")
+        text="☑️ Заказ Готов",
+        callback_data=EditOrderStatusCallback(status="Готов", order_creator_id=order_creator_id
+                                              )
     )
     builder.button(
-        text="🚫 Заказ Не готов", callback_data=EditOrderStatusCallback(status="Не готов")
+        text="🚫 Заказ Не готов",
+        callback_data=EditOrderStatusCallback(status="Не готов", order_creator_id=order_creator_id
+                                              )
     )
     builder.button(
-        text="💤 Заказ выполнен", callback_data=EditOrderStatusCallback(status="Заказ выполнен")
+        text="💤 Заказ выполнен",
+        callback_data=EditOrderStatusCallback(status="Заказ выполнен", order_creator_id=order_creator_id
+                                              )
     )
 
     # Выравниваем кнопки по 4 в ряд, чтобы получилось 4 + 1

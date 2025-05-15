@@ -19,7 +19,7 @@ from keyboards.order_keyboard import (
     get_count_button,
     get_order_option_button,
     TableCallback,
-    ready_order
+    get_order_status_keyboard
 )
 
 router = Router()
@@ -97,7 +97,7 @@ async def handle_food_selection(message: Message, state: FSMContext):
         await message.bot.send_message(
             -4650814133,
             text=f"{order_text}\nСтатус заказа: Не готов",
-            reply_markup=ready_order()
+            reply_markup=get_order_status_keyboard(message.from_user.id)
         )
         await process_table_order(table_id, foods)
         await state.clear()
