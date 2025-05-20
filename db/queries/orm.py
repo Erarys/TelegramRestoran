@@ -5,8 +5,6 @@ from sqlalchemy import desc, select
 from db.database import engine, Base, factory_session
 from db.models import OrderFoodORM, FoodsORM, MenuORM, TableORM
 
-import pandas as pd
-
 
 async def create_table():
     # Создаем все таблицы наследованные из класса Base
@@ -14,9 +12,6 @@ async def create_table():
 
 
 async def create_report(start_date: datetime, end_date: datetime):
-    file_path = f"reports/report_{start_date:%Y%m%d}_{end_date:%Y%m%d}.xlsx"
-
-    print(file_path)
 
     with factory_session() as session:
         with session.begin():
@@ -28,18 +23,7 @@ async def create_report(start_date: datetime, end_date: datetime):
             )
             current_order_foods = session.execute(stmt).scalars().all()
 
-            ls = []
-            for food in current_order_foods:
-                ls.append([food.food, food.count, food.price_per_unit])
-
-            sum_food = sum(price * count for food, count, price in ls)
-            ls.append(["Сумма всех продаж", "", sum_food])
-            df = pd.DataFrame(ls, columns=['Меню', 'кол-во', 'Цена'])
-            df.to_excel(file_path)
-
-            return file_path
-
-
+            return current_order_foods
 
 
 async def process_table_order(table_id, foods: dict):
