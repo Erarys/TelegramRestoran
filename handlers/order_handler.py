@@ -42,8 +42,8 @@ def format_order_text(table_id: str, foods: dict) -> str:
 @router.message(Command("Отменить"), OrderForm())
 async def cancel_create_order(message: Message, state: FSMContext):
     await state.clear()
-    await state.set_state(OrderForm.table_id)
-    await message.answer("Отменено ❎", reply_markup=get_table_button())
+    # await state.set_state(OrderForm.table_id)
+    await message.answer("Отменено ❎") #, reply_markup=get_table_button()
 
 @router.callback_query(TableCallback.filter())
 async def table_action(callback: CallbackQuery, callback_data: TableCallback, state: FSMContext):

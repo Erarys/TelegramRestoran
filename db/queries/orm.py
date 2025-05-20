@@ -1,12 +1,44 @@
-from sqlalchemy import select, and_, delete, func, desc
+from datetime import datetime
+
+
+from sqlalchemy import desc, select
 from db.database import engine, Base, factory_session
 from db.models import OrderFoodORM, FoodsORM, MenuORM, TableORM
-from typing import List
+
+import pandas as pd
 
 
 async def create_table():
     # Создаем все таблицы наследованные из класса Base
     Base.metadata.create_all(engine)
+
+
+async def create_report(start_date: datetime, end_date: datetime):
+    file_path = f"reports/report_{start_date:%Y%m%d}_{end_date:%Y%m%d}.xlsx"
+
+    print(file_path)
+
+    with factory_session() as session:
+        with session.begin():
+
+            stmt = (
+                select(FoodsORM)
+                .join(FoodsORM.order)
+                .where(OrderFoodORM.created_at.between(start_date, end_date))
+            )
+            current_order_foods = session.execute(stmt).scalars().all()
+
+            ls = []
+            for food in current_order_foods:
+                ls.append([food.food, food.count, food.price_per_unit])
+
+            sum_food = sum(price * count for food, count, price in ls)
+            ls.append(["Сумма всех продаж", "", sum_food])
+            df = pd.DataFrame(ls, columns=['Меню', 'кол-во', 'Цена'])
+            df.to_excel(file_path)
+
+            return file_path
+
 
 
 
