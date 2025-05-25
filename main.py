@@ -1,3 +1,6 @@
+from dotenv import load_dotenv
+load_dotenv()
+
 from aiogram import Bot, Dispatcher
 from aiogram.fsm.storage.redis import RedisStorage
 
@@ -29,9 +32,9 @@ async def main():
     dp.include_router(order_handler.router)
     dp.include_router(order_for_cook.router)
     dp.include_router(admin_handler.router)
-    # Base.metadata.drop_all(bind=engine)  # Удаляет все таблицы
-    # Base.metadata.create_all(bind=engine)  # Создает их заново по моделям
-    # await create_table()
+    Base.metadata.drop_all(bind=engine)  # Удаляет все таблицы
+    Base.metadata.create_all(bind=engine)  # Создает их заново по моделям
+    await create_table()
     await bot.delete_webhook(drop_pending_updates=True)
     await dp.start_polling(bot)
 
@@ -39,5 +42,5 @@ async def main():
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
-    asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+    # asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
     asyncio.run(main())

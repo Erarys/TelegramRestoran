@@ -7,7 +7,7 @@ from aiogram.types.input_file import FSInputFile
 
 import pandas as pd
 
-from db.queries.orm import create_report
+from db.queries.orm import create_report, fill_table, fill_menu
 from filters.base_filters import IsAdmin
 
 router = Router()
@@ -35,3 +35,7 @@ async def create_order_report(message: Message):
     await message.bot.send_document(message.chat.id, document)
 
 
+@router.message(Command("restart"))
+async def restart_order(message: Message):
+    await fill_table()
+    await fill_menu()
