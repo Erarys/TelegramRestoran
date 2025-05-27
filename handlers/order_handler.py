@@ -69,7 +69,7 @@ async def start(message: Message, state: FSMContext):
 
 
 @router.message(F.text, OrderForm.table_id)
-async def handle_table_input(message: Message, state: FSMContext):
+async def table_input(message: Message, state: FSMContext):
     table_id = message.text
     if not await check_free_table(table_id):
         text = await get_table_order(table_id)
@@ -85,7 +85,7 @@ async def handle_table_input(message: Message, state: FSMContext):
 
 
 @router.message(F.text, OrderForm.food)
-async def handle_food_selection(message: Message, state: FSMContext):
+async def food_selection(message: Message, state: FSMContext):
     text = message.text.strip()
     order = await state.get_data()
     foods = order.get("order_foods", {})
@@ -113,7 +113,7 @@ async def handle_food_selection(message: Message, state: FSMContext):
 
 
 @router.message(F.text, OrderForm.count)
-async def handle_food_count_input(message: Message, state: FSMContext):
+async def food_count_input(message: Message, state: FSMContext):
     order = await state.get_data()
     foods = order.get("order_foods", {})
     food_name = order.get("food")

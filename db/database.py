@@ -11,7 +11,7 @@ MY_URL_PYMYSQL = "mysql+pymysql://{USER}:{PASS}@{HOST}:{PORT}/{NAME}".format(
     NAME=os.getenv("DB_NAME")
 
 )
-print(MY_URL_PYMYSQL)
+
 engine = create_engine(
     url=MY_URL_PYMYSQL,
     echo=True

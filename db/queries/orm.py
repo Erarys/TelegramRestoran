@@ -107,20 +107,18 @@ async def get_table_order(table_id):
             return text
 
 
-async def fill_menu():
+async def fill_food_menu(name, price):
     with factory_session() as session:
         with session.begin():
-            foods_menu = {
-                "Баранина Шашлык": 1800,
-                "Утка Шашлык": 1600,
-                "Кока Кола 2л": 1000,
-                "Чипсы": 500,
-            }
-            for name, price in foods_menu.items():
-                food = MenuORM(food_name=name, price=price)
-                session.add(food)
+            food = MenuORM(food_name=name, price=price)
+            session.add(food)
             session.commit()
 
+async def get_menu():
+    with factory_session() as session:
+        with session.begin():
+            foods = session.query(MenuORM).all()
+            return foods
 
 async def fill_table():
     with factory_session() as session:

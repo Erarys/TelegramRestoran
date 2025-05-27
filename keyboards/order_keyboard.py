@@ -1,5 +1,3 @@
-from typing import Optional
-
 from aiogram.filters.callback_data import CallbackData
 from aiogram.types import KeyboardButton, InlineKeyboardButton, InlineKeyboardMarkup, CallbackQuery
 from aiogram.utils.keyboard import ReplyKeyboardBuilder, InlineKeyboardBuilder

@@ -1,14 +1,20 @@
 from datetime import datetime, timedelta
 
-from aiogram import Router
+from aiogram import Router, F
 from aiogram.filters import Command
+from aiogram.fsm.context import FSMContext
+from aiogram.fsm.state import StatesGroup, State
 from aiogram.types import Message
 from aiogram.types.input_file import FSInputFile
 
 import pandas as pd
 
-from db.queries.orm import create_report, fill_table, fill_menu
+from db.queries.orm import create_report, fill_table, fill_food_menu, get_menu
 from filters.base_filters import IsAdmin
+
+class MenuForm(StatesGroup):
+    name: str = State()
+    price: int = State()
 
 router = Router()
 router.message.filter(IsAdmin())
@@ -35,7 +41,38 @@ async def create_order_report(message: Message):
     await message.bot.send_document(message.chat.id, document)
 
 
-@router.message(Command("restart"))
+@router.message(Command("add_table"))
 async def restart_order(message: Message):
     await fill_table()
-    await fill_menu()
+
+@router.message(Command("update_menu"))
+async def update_menu(message: Message, state: FSMContext):
+    await state.clear()
+    foods = await get_menu()
+    text = "\n".join(f"{food.food_name} {food.price}" for food in foods)
+
+    await message.answer(
+        text=f"{text}"
+             f"Введите название продукта:"
+    )
+    await state.set_state(MenuForm.name)
+
+@router.message(F.text, MenuForm.name)
+async def food_name(message: Message, state: FSMContext):
+    name = message.text
+    await state.update_data(name=name)
+
+    await message.answer(text="Введите цену:")
+    await state.set_state(MenuForm.price)
+
+@router.message(F.text, MenuForm.price)
+async def food_price(message: Message, state: FSMContext):
+    price = message.text
+    await state.update_data(price=price)
+    food = await state.get_data()
+
+    if food.get("name") and food.get("price"):
+        await fill_food_menu(food.get("name"), food.get("price"))
+        await message.answer("Продукт успешно добавлен")
+    else:
+        await message.answer("Ошибка")

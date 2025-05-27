@@ -17,7 +17,6 @@ class ChatTypeFilter(BaseFilter):  # [1]
 
 class IsCook(BaseFilter):
     async def __call__(self, message: Message):
-        print(message.from_user.id)
         if message.from_user.id == 1833531133:
             return True
         await message.answer("Недостаточно прав доступа")
@@ -25,7 +24,6 @@ class IsCook(BaseFilter):
 
 class IsAdmin(BaseFilter):
     async def __call__(self, message: Message):
-        print(message.from_user.id)
         if message.from_user.id == 1833531133:
             return True
         await message.answer("Недостаточно прав доступа")
