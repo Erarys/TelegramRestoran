@@ -5,12 +5,17 @@ from aiogram.types import Message, CallbackQuery
 
 from aiogram.fsm.state import State, StatesGroup
 
-from db.queries.orm import (
-    process_table_order,
+from db.queries.check_get import (
+    get_table_foods,
     check_free_table,
     get_table_order,
-    clear_table,
-    get_table_foods, get_menu, get_table_amount
+    get_menu,
+    get_table_amount
+)
+
+from db.queries.orm import (
+    process_table_order,
+    clear_table
 )
 from filters.base_filters import ChatTypeFilter
 from keyboards.order_keyboard import (
@@ -43,6 +48,7 @@ def format_order_text(table_id: str, foods: dict) -> str:
 async def cancel_create_order(message: Message, state: FSMContext):
     await state.clear()
     await message.answer("Отменено ❎")
+
 
 @router.callback_query(TableCallback.filter())
 async def table_action(callback: CallbackQuery, callback_data: TableCallback, state: FSMContext):
@@ -104,6 +110,7 @@ async def food_selection(message: Message, state: FSMContext):
         # Выбираем имя или фамилию работника (выбираем не None)
         waiter_name = message.from_user.first_name or message.from_user.last_name
         amount = await get_table_amount()
+
         await message.answer(order_text, reply_markup=get_table_button(amount))
         await message.bot.send_message(
             -4650814133,

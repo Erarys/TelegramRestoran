@@ -12,8 +12,6 @@ async def check_free_table(table_id):
             return table.is_available
 
 
-
-
 async def get_table_foods(table_id):
     with factory_session() as session:
         with session.begin():

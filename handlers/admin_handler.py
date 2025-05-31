@@ -9,7 +9,8 @@ from aiogram.types.input_file import FSInputFile
 
 import pandas as pd
 
-from db.queries.orm import create_report, fill_table, fill_food_menu, get_menu, delete_menu
+from db.queries.check_get import get_menu
+from db.queries.orm import create_report, fill_table, fill_food_menu, delete_menu
 from filters.base_filters import IsAdmin
 from keyboards.admin_keyboard import get_menu_button, FoodDeleteCallback
 

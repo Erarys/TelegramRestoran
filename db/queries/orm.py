@@ -17,13 +17,7 @@ async def create_report(start_date: datetime, end_date: datetime):
             return current_order_foods
 
 
-async def process_table_order(table_id, foods: dict, waiter_name: str):
-    """
-    Создаёт или обновляет заказ для указанного стола.
-    :param waiter_name: имя сотрудника
-    :param table_id: номер стола
-    :param foods: словарь с названием блюда и количества {food: count}
-    """
+async def process_table_order(table_id: int, foods: dict, waiter_name: str):
     with factory_session() as session:
         with session.begin():
             table = session.query(TableORM).filter_by(number=table_id).first()
@@ -31,24 +25,51 @@ async def process_table_order(table_id, foods: dict, waiter_name: str):
                 raise ValueError(f"Table with id {table_id} not found")
 
             # Получаем блюда из меню
-            foods_objects = [
-                session.query(MenuORM).filter_by(food_name=food).first() for food in foods.keys()
-            ]
-
-            food_entries = [
-                FoodsORM(food=food_object.food_name, price_per_unit=food_object.price, count=count)
-                for food_object, count in zip(foods_objects, foods.values()) if food_object
-            ]
-
-            order = OrderFoodORM(table=table, created_waiter=waiter_name)
-
-            order.foods.extend(food_entries)
-            session.add(order)
+            foods_objects = {
+                food_name: session.query(MenuORM).filter_by(food_name=food_name).first()
+                for food_name in foods.keys()
+            }
 
             if table.is_available:
+                # Создание нового заказа
+                food_entries = [
+                    FoodsORM(food=food_name, price_per_unit=menu_obj.price, count=count)
+                    for food_name, count in foods.items()
+                    if (menu_obj := foods_objects[food_name])  # безопасная проверка существования
+                ]
+                order = OrderFoodORM(table=table, created_waiter=waiter_name)
+                order.foods.extend(food_entries)
+                session.add(order)
                 table.is_available = False
 
+            else:
+                # Обновление последнего заказа
+                order = (
+                    session.query(OrderFoodORM)
+                    .filter_by(table_id=table.id, created_waiter=waiter_name)
+                    .order_by(OrderFoodORM.created_at.desc())
+                    .first()
+                )
+                if not order:
+                    raise ValueError(f"No active order found for table {table_id}")
+
+                # Обновляем блюда
+                existing_foods = {food.food: food for food in order.foods}
+                for food_name, count in foods.items():
+                    if food_name in existing_foods:
+                        existing_foods[food_name].count = count
+                    else:
+                        menu_obj = foods_objects.get(food_name)
+                        if menu_obj:
+                            new_food = FoodsORM(
+                                food=food_name,
+                                price_per_unit=menu_obj.price,
+                                count=count
+                            )
+                            order.foods.append(new_food)
+
             session.commit()
+
 
 
 async def clear_table(table_id):
@@ -59,20 +80,20 @@ async def clear_table(table_id):
                 table.is_available = True
 
 
-async def fill_food_menu(name, price):
-    with factory_session() as session:
-        with session.begin():
-            food = MenuORM(food_name=name, price=price)
-            session.add(food)
-            session.commit()
-
-
 async def delete_menu(id: int):
     with factory_session() as session:
         with  session.begin():
             food = session.query(MenuORM).filter_by(id=id).first()
             if food:
                 session.delete(food)
+
+
+async def fill_food_menu(name, price):
+    with factory_session() as session:
+        with session.begin():
+            food = MenuORM(food_name=name, price=price)
+            session.add(food)
+            session.commit()
 
 
 async def fill_table(amount: int):

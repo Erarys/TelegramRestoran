@@ -5,7 +5,7 @@ from aiogram import Bot, Dispatcher
 from aiogram.fsm.storage.redis import RedisStorage
 
 from db.database import Base, engine
-from db.queries.orm import create_table
+# from db.queries.orm import create_table
 from handlers import (
     order_handler,
     order_for_cook,
@@ -38,7 +38,7 @@ async def main():
     dp.include_router(admin_handler.router)
     # Base.metadata.drop_all(bind=engine)  # Удаляет все таблицы
     # Base.metadata.create_all(bind=engine)  # Создает их заново по моделям
-    await create_table()
+    # await create_table()
     await bot.delete_webhook(drop_pending_updates=True)
     await dp.start_polling(bot)
 
