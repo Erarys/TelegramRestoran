@@ -10,7 +10,7 @@ from db.queries.orm import (
     check_free_table,
     get_table_order,
     clear_table,
-    get_table_foods, get_menu
+    get_table_foods, get_menu, get_table_amount
 )
 from filters.base_filters import ChatTypeFilter
 from keyboards.order_keyboard import (
@@ -42,8 +42,7 @@ def format_order_text(table_id: str, foods: dict) -> str:
 @router.message(Command("Отменить"), OrderForm())
 async def cancel_create_order(message: Message, state: FSMContext):
     await state.clear()
-    # await state.set_state(OrderForm.table_id)
-    await message.answer("Отменено ❎") #, reply_markup=get_table_button()
+    await message.answer("Отменено ❎")
 
 @router.callback_query(TableCallback.filter())
 async def table_action(callback: CallbackQuery, callback_data: TableCallback, state: FSMContext):
@@ -71,7 +70,8 @@ async def table_action(callback: CallbackQuery, callback_data: TableCallback, st
 async def start(message: Message, state: FSMContext):
     await state.clear()
     # message.from_user.first_name
-    await message.answer(text=f"Введите номер стола: ", reply_markup=get_table_button())
+    amount = await get_table_amount()
+    await message.answer(text=f"Введите номер стола: ", reply_markup=get_table_button(amount))
     await state.set_state(OrderForm.table_id)
 
 
@@ -103,8 +103,8 @@ async def food_selection(message: Message, state: FSMContext):
         order_text = format_order_text(table_id, foods)
         # Выбираем имя или фамилию работника (выбираем не None)
         waiter_name = message.from_user.first_name or message.from_user.last_name
-
-        await message.answer(order_text, reply_markup=get_table_button())
+        amount = await get_table_amount()
+        await message.answer(order_text, reply_markup=get_table_button(amount))
         await message.bot.send_message(
             -4650814133,
             text=f"{order_text}\nСтатус заказа: Не готов",

@@ -13,10 +13,10 @@ class EditOrderStatusCallback(CallbackData, prefix="edit_status"):
     order_creator_id: int
 
 
-def get_table_button():
+def get_table_button(amount: int):
     builder = ReplyKeyboardBuilder()
 
-    for i in range(1, 6):
+    for i in range(1, amount + 1):
         builder.add(KeyboardButton(text=str(i)))
 
     builder.adjust(3)

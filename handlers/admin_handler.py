@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 
 from aiogram import Router, F
-from aiogram.filters import Command
+from aiogram.filters import Command, CommandObject
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
 from aiogram.types import Message, ReplyKeyboardMarkup, CallbackQuery
@@ -44,8 +44,14 @@ async def create_order_report(message: Message):
 
 
 @router.message(Command("add_table"))
-async def restart_order(message: Message):
-    await fill_table()
+async def restart_order(message: Message, command: CommandObject):
+    args = command.args
+    if args.isdigit():
+        amount = int(args)
+        await fill_table(amount)
+        await message.answer("Таблица создана")
+    else:
+        await message.answer("Аргумент должно быть целым числом!")
 
 @router.callback_query(FoodDeleteCallback.filter())
 async def delete_food(callback: CallbackQuery, callback_data: FoodDeleteCallback):

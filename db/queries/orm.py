@@ -135,11 +135,18 @@ async def delete_menu(id: int):
                 session.delete(food)
 
 
-async def fill_table():
+async def fill_table(amount: int):
     with factory_session() as session:
         with session.begin():
-            ls = list(range(1, 6))
-            for index in ls:
-                table = TableORM(number=index)
+            for number in range(1, amount + 1):
+                table = session.query(TableORM).filter_by(number=number).first()
+                if table:
+                    continue
+
+                table = TableORM(number=number)
                 session.add(table)
             session.commit()
+
+async def get_table_amount():
+    with factory_session() as session:
+        return session.query(TableORM).count()
