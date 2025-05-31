@@ -24,13 +24,15 @@ def get_table_button():
     return builder.as_markup()
 
 
-def get_order_button(foods_menu):
+def get_order_button(menu):
     builder = ReplyKeyboardBuilder()
-    foods_menu.append("/Отменить")
 
-    for food in foods_menu:
-        builder.add(KeyboardButton(text=str(food)))
 
+    for food in menu.values():
+        builder.add(KeyboardButton(text=str(food["name"])))
+
+    builder.add(KeyboardButton(text="/Отменить"))
+    builder.add(KeyboardButton(text="Сохранить"))
     builder.adjust(3)
     return builder.as_markup()
 

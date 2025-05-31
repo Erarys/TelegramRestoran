@@ -10,7 +10,7 @@ from db.queries.orm import (
     check_free_table,
     get_table_order,
     clear_table,
-    get_table_foods
+    get_table_foods, get_menu
 )
 from filters.base_filters import ChatTypeFilter
 from keyboards.order_keyboard import (
@@ -47,6 +47,11 @@ async def cancel_create_order(message: Message, state: FSMContext):
 
 @router.callback_query(TableCallback.filter())
 async def table_action(callback: CallbackQuery, callback_data: TableCallback, state: FSMContext):
+    """
+    Возможность очищать стол
+    редактировать стол, делать новый заказ
+    """
+
     table_id = callback_data.table_id
     if callback_data.action == "clear":
         await clear_table(table_id)
@@ -54,9 +59,10 @@ async def table_action(callback: CallbackQuery, callback_data: TableCallback, st
 
     elif callback_data.action == "edit":
         foods = await get_table_foods(table_id)
+        menu = await get_menu()
         await state.update_data(table_id=table_id, order_foods=foods)
         await state.set_state(OrderForm.food)
-        await callback.message.answer(text="Выберите меню:", reply_markup=get_order_button())
+        await callback.message.answer(text="Выберите меню:", reply_markup=get_order_button(menu))
 
     await callback.answer()
 
@@ -80,7 +86,8 @@ async def table_input(message: Message, state: FSMContext):
         )
     else:
         await state.update_data(table_id=message.text)
-        await message.answer(text="Выберите меню:", reply_markup=get_order_button())
+        menu = await get_menu()
+        await message.answer(text="Выберите меню:", reply_markup=get_order_button(menu))
         await state.set_state(OrderForm.food)
 
 
@@ -137,5 +144,6 @@ async def food_count_input(message: Message, state: FSMContext):
     await state.update_data(order_foods=foods)
 
     order_text = format_order_text(table_id, foods)
-    await message.answer(text=order_text, reply_markup=get_order_button())
+    menu = await get_menu()
+    await message.answer(text=order_text, reply_markup=get_order_button(menu))
     await state.set_state(OrderForm.food)
