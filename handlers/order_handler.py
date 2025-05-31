@@ -70,7 +70,8 @@ async def table_action(callback: CallbackQuery, callback_data: TableCallback, st
 @router.message(CommandStart())
 async def start(message: Message, state: FSMContext):
     await state.clear()
-    await message.answer(text="Введите номер стола:", reply_markup=get_table_button())
+    # message.from_user.first_name
+    await message.answer(text=f"Введите номер стола: ", reply_markup=get_table_button())
     await state.set_state(OrderForm.table_id)
 
 
@@ -100,13 +101,16 @@ async def food_selection(message: Message, state: FSMContext):
 
     if text == "Сохранить":
         order_text = format_order_text(table_id, foods)
+        # Выбираем имя или фамилию работника (выбираем не None)
+        waiter_name = message.from_user.first_name or message.from_user.last_name
+
         await message.answer(order_text, reply_markup=get_table_button())
         await message.bot.send_message(
             -4650814133,
             text=f"{order_text}\nСтатус заказа: Не готов",
             reply_markup=get_order_status_keyboard(message.from_user.id)
         )
-        await process_table_order(table_id, foods)
+        await process_table_order(table_id, foods, waiter_name)
         await state.clear()
         await state.set_state(OrderForm.table_id)
         return

@@ -23,6 +23,7 @@ class OrderFoodORM(Base):
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     table_id: Mapped[int] = mapped_column(ForeignKey("table.id"))
     foods: Mapped[List["FoodsORM"]] = relationship(back_populates="order", cascade="all, delete-orphan")
+    created_waiter: Mapped[str] = mapped_column(String(length=100))
     created_at: Mapped[datetime] = mapped_column(default=datetime.utcnow)
 
     table: Mapped["TableORM"] = relationship(back_populates="orders")

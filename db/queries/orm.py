@@ -1,6 +1,5 @@
 from datetime import datetime
 
-
 from sqlalchemy import desc, select
 from db.database import engine, Base, factory_session
 from db.models import OrderFoodORM, FoodsORM, MenuORM, TableORM
@@ -12,10 +11,8 @@ async def create_table():
 
 
 async def create_report(start_date: datetime, end_date: datetime):
-
     with factory_session() as session:
         with session.begin():
-
             stmt = (
                 select(FoodsORM)
                 .join(FoodsORM.order)
@@ -26,11 +23,12 @@ async def create_report(start_date: datetime, end_date: datetime):
             return current_order_foods
 
 
-async def process_table_order(table_id, foods: dict):
+async def process_table_order(table_id, foods: dict, waiter_name: str):
     """
     Создаёт или обновляет заказ для указанного стола.
+    :param waiter_name: имя сотрудника
     :param table_id: номер стола
-    :param foods: словарь с названием блюда и количеством
+    :param foods: словарь с названием блюда и количества {food: count}
     """
     with factory_session() as session:
         with session.begin():
@@ -48,7 +46,8 @@ async def process_table_order(table_id, foods: dict):
                 for food_object, count in zip(foods_objects, foods.values()) if food_object
             ]
 
-            order = OrderFoodORM(table=table)
+            order = OrderFoodORM(table=table, created_waiter=waiter_name)
+
             order.foods.extend(food_entries)
             session.add(order)
 
@@ -114,6 +113,7 @@ async def fill_food_menu(name, price):
             session.add(food)
             session.commit()
 
+
 async def get_menu():
     with factory_session() as session:
         with session.begin():
@@ -126,12 +126,14 @@ async def get_menu():
             } for food in foods
         }
 
+
 async def delete_menu(id: int):
     with factory_session() as session:
         with  session.begin():
             food = session.query(MenuORM).filter_by(id=id).first()
             if food:
                 session.delete(food)
+
 
 async def fill_table():
     with factory_session() as session:
