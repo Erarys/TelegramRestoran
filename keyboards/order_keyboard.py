@@ -24,16 +24,10 @@ def get_table_button():
     return builder.as_markup()
 
 
-def get_order_button():
+def get_order_button(foods_menu):
     builder = ReplyKeyboardBuilder()
-    foods_menu = [
-        "Баранина Шашлык",
-        "Утка Шашлык",
-        "Кока Кола 2л",
-        "Чипсы",
-        "Сохранить",
-        "/Отменить"
-    ]
+    foods_menu.append("/Отменить")
+
     for food in foods_menu:
         builder.add(KeyboardButton(text=str(food)))
 

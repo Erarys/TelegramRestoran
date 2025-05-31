@@ -4,13 +4,15 @@ from aiogram import Router, F
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
-from aiogram.types import Message
+from aiogram.types import Message, ReplyKeyboardMarkup, CallbackQuery
 from aiogram.types.input_file import FSInputFile
 
 import pandas as pd
 
-from db.queries.orm import create_report, fill_table, fill_food_menu, get_menu
+from db.queries.orm import create_report, fill_table, fill_food_menu, get_menu, delete_menu
 from filters.base_filters import IsAdmin
+from keyboards.admin_keyboard import get_menu_button, FoodDeleteCallback
+
 
 class MenuForm(StatesGroup):
     name: str = State()
@@ -45,16 +47,26 @@ async def create_order_report(message: Message):
 async def restart_order(message: Message):
     await fill_table()
 
+@router.callback_query(FoodDeleteCallback.filter())
+async def delete_food(callback: CallbackQuery, callback_data: FoodDeleteCallback):
+    food_id = callback_data.food_id
+    await delete_menu(food_id)
+    await callback.message.edit_text("Удалено", reply_markup=None)
+
+
 @router.message(Command("update_menu"))
 async def update_menu(message: Message, state: FSMContext):
     await state.clear()
-    foods = await get_menu()
-    text = "\n".join(f"{food.food_name} {food.price}" for food in foods)
+    menu: dict = await get_menu()
 
-    await message.answer(
-        text=f"{text}"
-             f"Введите название продукта:"
-    )
+    for id in menu.keys():
+        await message.answer(
+            text=f"{menu[id]['name']}\n"
+                 f"Введите название продукта:",
+            reply_markup=get_menu_button(id)
+        )
+
+    await message.answer(text="Введите название продукта:")
     await state.set_state(MenuForm.name)
 
 @router.message(F.text, MenuForm.name)

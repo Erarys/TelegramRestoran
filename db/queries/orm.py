@@ -118,7 +118,20 @@ async def get_menu():
     with factory_session() as session:
         with session.begin():
             foods = session.query(MenuORM).all()
-            return foods
+
+        return {
+            food.id: {
+                "name": food.food_name,
+                "price": food.price
+            } for food in foods
+        }
+
+async def delete_menu(id: int):
+    with factory_session() as session:
+        with  session.begin():
+            food = session.query(MenuORM).filter_by(id=id).first()
+            if food:
+                session.delete(food)
 
 async def fill_table():
     with factory_session() as session:
