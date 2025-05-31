@@ -4,12 +4,6 @@ from sqlalchemy import desc, select
 from db.database import engine, Base, factory_session
 from db.models import OrderFoodORM, FoodsORM, MenuORM, TableORM
 
-
-async def create_table():
-    # Создаем все таблицы наследованные из класса Base
-    Base.metadata.create_all(engine)
-
-
 async def create_report(start_date: datetime, end_date: datetime):
     with factory_session() as session:
         with session.begin():
@@ -57,13 +51,6 @@ async def process_table_order(table_id, foods: dict, waiter_name: str):
             session.commit()
 
 
-async def check_free_table(table_id):
-    with factory_session() as session:
-        with session.begin():
-            table = session.query(TableORM).filter_by(number=table_id).first()
-            return table.is_available
-
-
 async def clear_table(table_id):
     with factory_session() as session:
         with session.begin():
@@ -72,59 +59,12 @@ async def clear_table(table_id):
                 table.is_available = True
 
 
-async def get_table_foods(table_id):
-    with factory_session() as session:
-        with session.begin():
-            table = session.query(TableORM).filter_by(number=table_id).first()
-            order = (
-                session.query(OrderFoodORM)
-                .filter_by(table=table)
-                .order_by(desc(OrderFoodORM.created_at))
-                .first()
-            )
-
-            return {food.food: food.count for food in order.foods}
-
-
-async def get_table_order(table_id):
-    with factory_session() as session:
-        with session.begin():
-            table = session.query(TableORM).filter_by(number=table_id).first()
-            order = (
-                session.query(OrderFoodORM)
-                .filter_by(table=table)
-                .order_by(desc(OrderFoodORM.created_at))
-                .first()
-            )
-
-            full_price = 0
-
-            for food in order.foods:
-                full_price += food.price_per_unit * food.count
-            text = "\n".join(f"{food.food} {food.count} {food.price_per_unit}" for food in order.foods)
-            text += f"\nИтого: {full_price}"
-            return text
-
-
 async def fill_food_menu(name, price):
     with factory_session() as session:
         with session.begin():
             food = MenuORM(food_name=name, price=price)
             session.add(food)
             session.commit()
-
-
-async def get_menu():
-    with factory_session() as session:
-        with session.begin():
-            foods = session.query(MenuORM).all()
-
-        return {
-            food.id: {
-                "name": food.food_name,
-                "price": food.price
-            } for food in foods
-        }
 
 
 async def delete_menu(id: int):
@@ -147,6 +87,3 @@ async def fill_table(amount: int):
                 session.add(table)
             session.commit()
 
-async def get_table_amount():
-    with factory_session() as session:
-        return session.query(TableORM).count()
