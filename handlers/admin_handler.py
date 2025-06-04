@@ -24,6 +24,7 @@ router.message.filter(IsAdmin())
 
 @router.message(Command("report"))
 async def create_order_report(message: Message):
+    print(message.chat.id)
     start_date = datetime.today()
     end_date = datetime.today() - timedelta(days=1)
     file_path = f"reports/report_{start_date:%Y%m%d}_{end_date:%Y%m%d}.xlsx"

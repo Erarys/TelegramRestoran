@@ -20,7 +20,7 @@ async def edit_order_status(callback: CallbackQuery, callback_data: EditOrderSta
     with suppress(TelegramBadRequest):
         if callback_data.status == "Готов":
             await callback.message.bot.send_message(
-                callback_data.order_creator_id,# 1833531133,
+                callback_data.order_creator_id,
                 text=old_text + "\n Прошу забрать заказ🚨🚨🚨"
             )
 

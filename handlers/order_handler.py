@@ -113,7 +113,7 @@ async def food_selection(message: Message, state: FSMContext):
 
         await message.answer(order_text, reply_markup=get_table_button(amount))
         await message.bot.send_message(
-            -4650814133,
+            -4951332350,
             text=f"{order_text}\nСтатус заказа: Не готов",
             reply_markup=get_order_status_keyboard(message.from_user.id)
         )
