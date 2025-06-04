@@ -17,7 +17,7 @@ from db.queries.orm import (
     process_table_order,
     clear_table
 )
-from filters.base_filters import ChatTypeFilter
+from filters.base_filters import ChatTypeFilter, IsWaiter
 from keyboards.order_keyboard import (
     get_table_button,
     get_order_button,
@@ -30,7 +30,7 @@ from keyboards.order_keyboard import (
 router = Router()
 
 router.message.filter(ChatTypeFilter(chat_type=["private"]))
-
+router.message.filter(IsWaiter())
 
 class OrderForm(StatesGroup):
     table_id: str = State()
