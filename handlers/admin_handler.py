@@ -47,6 +47,9 @@ async def create_order_report(message: Message):
 @router.message(Command("add_table"))
 async def restart_order(message: Message, command: CommandObject):
     args = command.args
+    if not isinstance(args, str):
+        await message.answer("Вы не передали ни одного аргумента")
+
     if args.isdigit():
         amount = int(args)
         await fill_table(amount)
