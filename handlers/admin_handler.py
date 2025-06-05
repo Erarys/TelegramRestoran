@@ -24,21 +24,13 @@ router.message.filter(IsAdmin())
 
 @router.message(Command("report"))
 async def create_order_report(message: Message):
-    print(message.chat.id)
-    start_date = datetime.today()
-    end_date = datetime.today() - timedelta(days=1)
+    start_date = datetime.today() - timedelta(days=1)
+    end_date = datetime.today()
     file_path = f"reports/report_{start_date:%Y%m%d}_{end_date:%Y%m%d}.xlsx"
-    current_order_foods = await create_report(start_date, end_date)
+    orders_dt = await create_report(start_date, end_date)
 
-    ls = []
-    for food in current_order_foods:
-        ls.append([food.food, food.count, food.price_per_unit])
 
-    sum_food = sum(price * count for food, count, price in ls)
-
-    ls.append(["Сумма всех продаж", "", sum_food])
-
-    df = pd.DataFrame(ls, columns=['Меню', 'кол-во', 'Цена'])
+    df = pd.DataFrame.from_dict(orders_dt, orient='index')  # ключи 10, 11 станут индексами
     df.to_excel(file_path)
 
     document = FSInputFile(file_path)

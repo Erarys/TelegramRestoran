@@ -1,20 +1,34 @@
 from datetime import datetime
 
 from sqlalchemy import desc, select
+from sqlalchemy.orm import selectinload
+
 from db.database import engine, Base, factory_session
 from db.models import OrderFoodORM, FoodsORM, MenuORM, TableORM
+
 
 async def create_report(start_date: datetime, end_date: datetime):
     with factory_session() as session:
         with session.begin():
-            stmt = (
-                select(FoodsORM)
-                .join(FoodsORM.order)
-                .where(OrderFoodORM.created_at.between(start_date, end_date))
-            )
-            current_order_foods = session.execute(stmt).scalars().all()
+            orders_dt = dict()
 
-            return current_order_foods
+            stmt = (
+                select(OrderFoodORM)
+                .options(selectinload(OrderFoodORM.foods))
+                .where(OrderFoodORM.created_at.between(start_date, end_date))
+                .order_by(OrderFoodORM.table_id)
+            )
+            orders = session.execute(stmt).scalars().all()
+
+            for order in orders:
+                orders_dt[order.id] = {
+                    "table_id": order.table_id,
+                    "waiter": order.created_waiter,
+                    "foods": " - ".join([food.food for food in order.foods]),
+                    "sum": sum([int(food.price_per_unit) for food in order.foods]),
+                }
+
+            return orders_dt
 
 
 async def process_table_order(table_id: int, foods: dict, waiter_name: str):
@@ -71,7 +85,6 @@ async def process_table_order(table_id: int, foods: dict, waiter_name: str):
             session.commit()
 
 
-
 async def clear_table(table_id):
     with factory_session() as session:
         with session.begin():
@@ -107,4 +120,3 @@ async def fill_table(amount: int):
                 table = TableORM(number=number)
                 session.add(table)
             session.commit()
-
