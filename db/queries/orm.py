@@ -22,10 +22,10 @@ async def create_report(start_date: datetime, end_date: datetime):
 
             for order in orders:
                 orders_dt[order.id] = {
-                    "table_id": order.table_id,
-                    "waiter": order.created_waiter,
-                    "foods": " - ".join([food.food for food in order.foods]),
-                    "sum": sum([int(food.price_per_unit) for food in order.foods]),
+                    "Номер стола": order.table_id,
+                    "Официант": order.created_waiter,
+                    "Заказ": " - ".join([food.food for food in order.foods]),
+                    "Чек": sum([int(food.price_per_unit) for food in order.foods]),
                 }
 
             return orders_dt
