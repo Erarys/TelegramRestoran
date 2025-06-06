@@ -8,7 +8,7 @@ from aiogram.types import Message, ReplyKeyboardMarkup, CallbackQuery
 from aiogram.types.input_file import FSInputFile
 
 from db.queries.check_get import get_menu
-from db.queries.orm import create_report, fill_table, fill_food_menu, delete_menu
+from db.queries.orm import create_report, create_report_period, fill_table, fill_food_menu, delete_menu
 from filters.base_filters import IsAdmin
 from keyboards.admin_keyboard import get_menu_button, FoodDeleteCallback
 
@@ -62,11 +62,24 @@ def excel_work(orders_df, excel_path):
 
 
 @router.message(Command("report"))
-async def create_order_report(message: Message):
-    start_date = datetime.today() - timedelta(days=1)
-    end_date = datetime.today()
-    file_path = f"reports/report_{start_date:%Y%m%d}_{end_date:%Y%m%d}.xlsx"
-    orders_dt = await create_report(start_date, end_date)
+async def create_order_report(message: Message, command: CommandObject):
+
+    if command.args is not None:
+        try:
+            start_day, end_day = command.args.split()
+            file_path = f"reports/report_{start_day} {end_day}.xlsx"
+            start_day_time = datetime.strptime(start_day, "%d.%m.%Y")
+            end_day_time = datetime.strptime(end_day, "%d.%m.%Y")
+
+            orders_dt = await create_report_period(start_day_time, end_day_time)
+        except:
+            await message.answer("Ошибка")
+    else:
+        today = datetime.today()
+        file_path = f"reports/report_{today:%Y%m%d}.xlsx"
+
+        orders_dt = await create_report(today)
+
 
     orders_dt["Итого"] = {
         "Чек": sum([value["Чек"] for value in orders_dt.values()])

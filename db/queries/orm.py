@@ -7,7 +7,7 @@ from db.database import engine, Base, factory_session
 from db.models import OrderFoodORM, FoodsORM, MenuORM, TableORM
 
 
-async def create_report(start_date: datetime, end_date: datetime):
+async def create_report_period(start_date: datetime, end_date: datetime):
     with factory_session() as session:
         with session.begin():
             orders_dt = dict()
@@ -16,6 +16,30 @@ async def create_report(start_date: datetime, end_date: datetime):
                 select(OrderFoodORM)
                 .options(selectinload(OrderFoodORM.foods))
                 .where(OrderFoodORM.created_at.between(start_date, end_date))
+                .order_by(OrderFoodORM.table_id)
+            )
+            orders = session.execute(stmt).scalars().all()
+
+            for order in orders:
+                orders_dt[order.id] = {
+                    "Номер стола": order.table_id,
+                    "Официант": order.created_waiter,
+                    "Заказ": " - ".join([food.food for food in order.foods]),
+                    "Чек": sum([int(food.price_per_unit) for food in order.foods]),
+                }
+            print(orders_dt)
+            return orders_dt
+
+
+async def create_report(today: datetime):
+    with factory_session() as session:
+        with session.begin():
+            orders_dt = dict()
+
+            stmt = (
+                select(OrderFoodORM)
+                .options(selectinload(OrderFoodORM.foods))
+                .where(OrderFoodORM.created_at == today)
                 .order_by(OrderFoodORM.table_id)
             )
             orders = session.execute(stmt).scalars().all()
