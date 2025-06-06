@@ -35,7 +35,7 @@ class FoodsORM(Base):
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     food: Mapped[str] = mapped_column(String(length=100))
     count: Mapped[int]
-    price_per_unit: Mapped[float]
+    price_per_unit: Mapped[int]
     order_id: Mapped[int] = mapped_column(ForeignKey("order_food.id"))
 
     order: Mapped["OrderFoodORM"] = relationship(back_populates="foods")
@@ -46,4 +46,4 @@ class MenuORM(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     food_name: Mapped[str] = mapped_column(String(length=100), unique=True)
-    price: Mapped[float]
+    price: Mapped[int]

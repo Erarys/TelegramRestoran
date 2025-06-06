@@ -40,8 +40,8 @@ class OrderForm(StatesGroup):
 
 
 def format_order_text(table_id: str, foods: dict) -> str:
-    items = "\n".join(f"{k}: {v}" for k, v in foods.items())
-    return f"Стол {table_id}\n{items}"
+    text = "\n".join(f"• {name}: {count}шт" for name, count in foods.items())
+    return f"<b>Стол:</b> {table_id}\n\n{text}"
 
 
 @router.message(Command("Отменить"), OrderForm())
@@ -84,6 +84,10 @@ async def start(message: Message, state: FSMContext):
 @router.message(F.text, OrderForm.table_id)
 async def table_input(message: Message, state: FSMContext):
     table_id = message.text
+    if not table_id or not table_id.strip().isdigit():
+        await message.answer("Введите номер стола 🚨")
+        return
+
     if not await check_free_table(table_id):
         bill = await get_table_order(table_id)
 
@@ -98,13 +102,13 @@ async def table_input(message: Message, state: FSMContext):
             summary = price * count
             bill_sum += summary
 
-            lines.append(f"{index}) {name} <i>{count}x{price}</i> = {summary}")
+            lines.append(f"{index}) {name} <i>{count}x{price}</i> = {summary}тг")
 
-        lines.append(f"\nИтого: {bill_sum}")
+        lines.append(f"\n<i>Итого</i>: {bill_sum}тг")
         text = "\n".join(lines)
 
         await message.answer(
-            text=f"Стол занят\n{text}",
+            text=f"<b>Стол занят: {table_id}</b>\n\n{text}",
             reply_markup=get_order_option_button(table_id)
         )
     else:
