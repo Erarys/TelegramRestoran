@@ -120,6 +120,7 @@ async def update_menu(message: Message, state: FSMContext):
     for id in menu.keys():
         await message.answer(
             text=f"{menu[id]['name']}\n"
+                 f"{menu[id]['price']}\n"
                  f"Введите название продукта:",
             reply_markup=get_menu_button(id)
         )
@@ -144,7 +145,11 @@ async def food_price(message: Message, state: FSMContext):
     food = await state.get_data()
 
     if food.get("name") and food.get("price"):
-        await fill_food_menu(food.get("name"), food.get("price"))
-        await message.answer("Продукт успешно добавлен")
+        is_exist = await fill_food_menu(food.get("name"), food.get("price"))
+        print(food.get("name"))
+        if is_exist:
+            await message.answer("Продукт уже существует, сначала удалите старый 🚨")
+        else:
+            await message.answer("Продукт успешно добавлен")
     else:
         await message.answer("Ошибка")

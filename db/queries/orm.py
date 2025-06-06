@@ -128,9 +128,14 @@ async def delete_menu(id: int):
 async def fill_food_menu(name, price):
     with factory_session() as session:
         with session.begin():
-            food = MenuORM(food_name=name, price=price)
-            session.add(food)
-            session.commit()
+            food = session.query(MenuORM).filter_by(food_name=name).first()
+            if food is None:
+                food = MenuORM(food_name=name, price=price)
+                session.add(food)
+                session.commit()
+            else:
+                return True
+
 
 
 async def fill_table(amount: int):
