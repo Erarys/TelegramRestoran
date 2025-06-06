@@ -1,5 +1,7 @@
 import json, os
 
+from aiogram.client.default import DefaultBotProperties
+from aiogram.enums import ParseMode
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -26,7 +28,12 @@ async def main():
     Соединяет все роутеры к диспетчеру
     :return:
     """
-    bot = Bot(token=os.getenv("TOKEN"))
+    bot = Bot(
+        token=os.getenv("TOKEN"),
+        default=DefaultBotProperties(
+            parse_mode=ParseMode.HTML
+        )
+    )
 
     # Clear the fsm storage
     redis = await storage.redis

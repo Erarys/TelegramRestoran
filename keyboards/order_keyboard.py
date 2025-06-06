@@ -56,12 +56,6 @@ def get_order_option_button(table_id) -> InlineKeyboardButton:
                 callback_data=TableCallback(action="clear", table_id=table_id).pack()
             ),
             InlineKeyboardButton(
-                text="🧾 Чек",
-                callback_data=TableCallback(action="bill", table_id=table_id).pack()
-            )
-        ],
-        [
-            InlineKeyboardButton(
                 text="📝 Редактировать",
                 callback_data=TableCallback(action="edit", table_id=table_id).pack()
             )

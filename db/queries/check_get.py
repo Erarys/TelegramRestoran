@@ -37,13 +37,16 @@ async def get_table_order(table_id):
                 .first()
             )
 
-            full_price = 0
+            bill = {
+                index: {
+                    "name": food.food,
+                    "count": food.count,
+                    "price": food.price_per_unit,
+                }
+                for index, food in enumerate(order.foods, start=1)
+            }
 
-            for food in order.foods:
-                full_price += food.price_per_unit * food.count
-            text = "\n".join(f"{food.food} {food.count} {food.price_per_unit}" for food in order.foods)
-            text += f"\nИтого: {full_price}"
-            return text
+            return bill
 
 
 async def get_menu():

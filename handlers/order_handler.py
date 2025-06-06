@@ -77,7 +77,7 @@ async def start(message: Message, state: FSMContext):
     await state.clear()
     # message.from_user.first_name
     amount = await get_table_amount()
-    await message.answer(text=f"Введите номер стола: ", reply_markup=get_table_button(amount))
+    await message.answer(text=f"<b>Введите номер стола:</b>", reply_markup=get_table_button(amount))
     await state.set_state(OrderForm.table_id)
 
 
@@ -85,7 +85,23 @@ async def start(message: Message, state: FSMContext):
 async def table_input(message: Message, state: FSMContext):
     table_id = message.text
     if not await check_free_table(table_id):
-        text = await get_table_order(table_id)
+        bill = await get_table_order(table_id)
+
+        lines = []
+        bill_sum = 0
+
+        for index, food in enumerate(bill.values(), start=1):
+            count = food.get("count", 0)
+            price = food.get("price", 0)
+            name = food.get("name", "—")
+
+            summary = price * count
+            bill_sum += summary
+
+            lines.append(f"{index}) {name} <i>{count}x{price}</i> = {summary}")
+
+        lines.append(f"\nИтого: {bill_sum}")
+        text = "\n".join(lines)
 
         await message.answer(
             text=f"Стол занят\n{text}",
