@@ -129,20 +129,27 @@ async def food_selection(message: Message, state: FSMContext):
         order_text = format_order_text(table_id, foods)
         # Выбираем имя или фамилию работника (выбираем не None)
         waiter_name = message.from_user.first_name or message.from_user.last_name
-        amount = await get_table_amount()
 
-        await message.answer(order_text, reply_markup=get_table_button(amount))
-        await message.bot.send_message(
+        msg = await message.bot.send_message(
             -4951332350,
-            text=f"{order_text}\nСтатус заказа: Не готов",
+            text=f"{order_text}\n\nСтатус заказа: Не готов",
             reply_markup=get_order_status_keyboard(message.from_user.id)
         )
+        # await message.bot.send_message(-4951332350, text, reply_to_message_id=msg.message_id)
+
+        # Тут обращаемся к базе и обновляем таблицу
         await process_table_order(table_id, foods, waiter_name)
         await state.clear()
         await state.set_state(OrderForm.table_id)
+
+        # Отправляем занаво кнопки для выбора стола
+        amount = await get_table_amount()
+        await message.answer(order_text, reply_markup=get_table_button(amount))
         return
 
-    foods[text] = 0
+    if foods.get(text, None) is None:
+        foods[text] = 0
+
     await state.update_data(order_foods=foods, food=text)
 
     order_text = format_order_text(table_id, foods)
@@ -165,9 +172,11 @@ async def food_count_input(message: Message, state: FSMContext):
     try:
         count = int(message.text)
         if count == 0:
-            foods.pop(food_name, None)
-        else:
+            foods[food_name] = 0
+        elif foods.get(food_name, None) is None:
             foods[food_name] = count
+        else:
+            foods[food_name] += count
     except ValueError:
         await message.answer("Введите целое число.")
         return

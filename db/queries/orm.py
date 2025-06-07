@@ -95,9 +95,13 @@ async def process_table_order(table_id: int, foods: dict, waiter_name: str):
                 existing_foods = {food.food: food for food in order.foods}
                 for food_name, count in foods.items():
                     if food_name in existing_foods:
-                        existing_foods[food_name].count = count
+                        if count == 0:
+                            order.foods.remove(existing_foods[food_name])
+                        else:
+                            existing_foods[food_name].count = count
                     else:
                         menu_obj = foods_objects.get(food_name)
+
                         if menu_obj:
                             new_food = FoodsORM(
                                 food=food_name,
