@@ -44,7 +44,7 @@ def format_order_text(table_id: str, foods: dict) -> str:
     return f"<b>Стол:</b> {table_id}\n\n{text}"
 
 
-@router.message(Command("Отменить"), OrderForm())
+@router.message(Command("stop"), OrderForm())
 async def cancel_create_order(message: Message, state: FSMContext):
     await state.clear()
     await message.answer("Отменено ❎")
@@ -114,7 +114,7 @@ async def table_input(message: Message, state: FSMContext):
     else:
         await state.update_data(table_id=message.text)
         menu = await get_menu()
-        await message.answer(text="Выберите меню:", reply_markup=get_order_button(menu))
+        await message.answer(text="<b>Выберите меню:</b>", reply_markup=get_order_button(menu))
         await state.set_state(OrderForm.food)
 
 
@@ -125,7 +125,7 @@ async def food_selection(message: Message, state: FSMContext):
     foods = order.get("order_foods", {})
     table_id = order.get("table_id")
 
-    if text == "Сохранить":
+    if text == "save":
         order_text = format_order_text(table_id, foods)
         # Выбираем имя или фамилию работника (выбираем не None)
         waiter_name = message.from_user.first_name or message.from_user.last_name
