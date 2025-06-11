@@ -17,7 +17,10 @@ async def edit_order_status(callback: CallbackQuery, callback_data: EditOrderSta
     used_text = callback.message.text
 
     text = re.sub(r"Статус заказа: .*$", f"Статус заказа: {callback_data.status}", used_text)
-    await callback.message.edit_text(text, reply_markup=get_order_status_keyboard(callback_data.order_creator_id))
+    try:
+        await callback.message.edit_text(text, reply_markup=get_order_status_keyboard(callback_data.order_creator_id))
+    except TelegramBadRequest:
+        await callback.answer("Сообщение отправлено")
     await callback.answer()
 
 

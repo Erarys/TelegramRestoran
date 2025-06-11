@@ -45,14 +45,15 @@ def format_order_text(table_id: str, foods: dict) -> str:
     return f"<b>Стол:</b> {table_id}\n\n{text}"
 
 def get_diff(new: dict, old: dict) -> dict:
-    diff = {}
+    foods = {}
     for key in new:
         old_count = old.get(key, 0)
         new_count = new[key]
         if new_count != old_count:
-            diff[key] = new_count - old_count
+            foods[key] = new_count - old_count
 
-    return diff
+    text = "\n".join(f"• {name}: {count}шт" for name, count in foods.items())
+    return text
 
 @router.message(Command("stop"), OrderForm())
 async def cancel_create_order(message: Message, state: FSMContext):
@@ -140,19 +141,29 @@ async def food_selection(message: Message, state: FSMContext):
 
         # Выбираем имя или фамилию работника (выбираем не None)
         waiter_name = message.from_user.first_name or message.from_user.last_name
-        msg = await message.bot.send_message(
-            -4951332350,
-            text=f"{order_text}\n\nСтатус заказа: Не готов",
-            reply_markup=get_order_status_keyboard(message.from_user.id)
-        )
+
 
         if not await check_free_table(table_id):
             msg_id = await get_table_order_message(table_id)
-            print("message_id IN", msg_id)
-            await message.bot.delete_message(-4951332350, msg_id)
+            foods_from_db = await get_table_foods(table_id)
+            try:
+                await message.bot.delete_message(-4951332350, msg_id)
+            except:
+                print("Message not found")
 
+            text = get_diff(foods, foods_from_db)
+            msg = await message.bot.send_message(
+                -4951332350,
+                text=f"{order_text}\n\nПохоже официант изменил меню👀 \n{text}\n\nСтатус заказа: Не готов",
+                reply_markup=get_order_status_keyboard(message.from_user.id)
+            )
 
-        print("message_ID ONE", msg.message_id)
+        else:
+            msg = await message.bot.send_message(
+                -4951332350,
+                text=f"{order_text}\n\nСтатус заказа: Не готов",
+                reply_markup=get_order_status_keyboard(message.from_user.id)
+            )
         # await message.bot.send_message(-4951332350, text, reply_to_message_id=msg.message_id)
         # Тут обращаемся к базе и обновляем таблицу
         await process_table_order(table_id, foods, waiter_name, msg.message_id)

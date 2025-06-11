@@ -12,7 +12,7 @@ async def check_free_table(table_id):
             return table.is_available
 
 
-async def get_table_foods(table_id):
+async def get_table_foods(table_id) -> dict:
     with factory_session() as session:
         with session.begin():
             table = session.query(TableORM).filter_by(number=table_id).first()
