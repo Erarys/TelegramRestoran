@@ -91,6 +91,7 @@ async def process_table_order(table_id: int, foods: dict, waiter_name: str, mess
                 if not order:
                     raise ValueError(f"No active order found for table {table_id}")
 
+                order.message_id = message_id
                 # Обновляем блюда
                 existing_foods = {food.food: food for food in order.foods}
                 for food_name, count in foods.items():
