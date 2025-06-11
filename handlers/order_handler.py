@@ -10,7 +10,7 @@ from db.queries.check_get import (
     check_free_table,
     get_table_order,
     get_menu,
-    get_table_amount
+    get_table_amount, get_table_order_message
 )
 
 from db.queries.orm import (
@@ -31,6 +31,7 @@ router = Router()
 
 router.message.filter(ChatTypeFilter(chat_type=["private"]))
 router.message.filter(IsWaiter())
+
 
 class OrderForm(StatesGroup):
     table_id: str = State()
@@ -135,10 +136,15 @@ async def food_selection(message: Message, state: FSMContext):
             text=f"{order_text}\n\nСтатус заказа: Не готов",
             reply_markup=get_order_status_keyboard(message.from_user.id)
         )
+        print(msg.message_id)
         # await message.bot.send_message(-4951332350, text, reply_to_message_id=msg.message_id)
 
+        if not await check_free_table(table_id):
+            msg_id = await get_table_order_message(table_id)
+            await message.bot.delete_message(-4951332350, msg_id)
+
         # Тут обращаемся к базе и обновляем таблицу
-        await process_table_order(table_id, foods, waiter_name)
+        await process_table_order(table_id, foods, waiter_name, msg.message_id)
         await state.clear()
         await state.set_state(OrderForm.table_id)
 

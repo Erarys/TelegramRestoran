@@ -55,7 +55,7 @@ async def create_report(today: datetime):
             return orders_dt
 
 
-async def process_table_order(table_id: int, foods: dict, waiter_name: str):
+async def process_table_order(table_id: int, foods: dict, waiter_name: str, message_id: int):
     with factory_session() as session:
         with session.begin():
             table = session.query(TableORM).filter_by(number=table_id).first()
@@ -75,7 +75,7 @@ async def process_table_order(table_id: int, foods: dict, waiter_name: str):
                     for food_name, count in foods.items()
                     if (menu_obj := foods_objects[food_name])  # безопасная проверка существования
                 ]
-                order = OrderFoodORM(table=table, created_waiter=waiter_name)
+                order = OrderFoodORM(table=table, created_waiter=waiter_name, message_id=message_id)
                 order.foods.extend(food_entries)
                 session.add(order)
                 table.is_available = False

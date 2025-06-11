@@ -25,6 +25,18 @@ async def get_table_foods(table_id):
 
             return {food.food: food.count for food in order.foods}
 
+async def get_table_order_message(table_id):
+    with factory_session() as session:
+        with session.begin():
+            table = session.query(TableORM).filter_by(number=table_id).first()
+            order = (
+                session.query(OrderFoodORM)
+                .filter_by(table=table)
+                .order_by(desc(OrderFoodORM.created_at))
+                .first()
+            )
+            return order.message_id
+
 
 async def get_table_order(table_id):
     with factory_session() as session:
