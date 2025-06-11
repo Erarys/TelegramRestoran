@@ -52,7 +52,10 @@ def get_diff(new: dict, old: dict) -> dict:
         if new_count != old_count:
             foods[key] = new_count - old_count
 
-    text = "\n".join(f"• {name}: {count}шт" for name, count in foods.items())
+    text = "\n".join(
+        f"✅ {name}: ➕{count}шт" if count > 0 else f"🔻 {name}: ➖{abs(count)}шт"
+        for name, count in foods.items()
+    )
     return text
 
 @router.message(Command("stop"), OrderForm())
