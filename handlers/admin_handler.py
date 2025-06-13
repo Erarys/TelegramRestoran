@@ -75,10 +75,11 @@ async def create_order_report(message: Message, command: CommandObject):
         except:
             await message.answer("Ошибка")
     else:
-        today = datetime.today()
+        today = datetime.today().replace(hour=0, minute=0, second=0, microsecond=0)
+        tomorrow = today + timedelta(days=1)
         file_path = f"reports/report_{today:%Y%m%d}.xlsx"
 
-        orders_dt = await create_report(today)
+        orders_dt = await create_report(today, tomorrow)
 
 
     orders_dt["Итого"] = {

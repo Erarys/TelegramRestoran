@@ -25,14 +25,14 @@ async def create_report_period(start_date: datetime, end_date: datetime):
                     "Номер стола": order.table_id,
                     "Официант": order.created_waiter,
                     "Заказ": " - ".join([food.food for food in order.foods]),
-                    "Чек": sum([int(food.price_per_unit) for food in order.foods]),
                     "Дата создания": order.created_at,
+                    "Чек": sum([int(food.price_per_unit) for food in order.foods]),
                 }
-            print(orders_dt)
+
             return orders_dt
 
 
-async def create_report(today: datetime):
+async def create_report(today: datetime, tomorrow: datetime):
     with factory_session() as session:
         with session.begin():
             orders_dt = dict()
@@ -40,7 +40,7 @@ async def create_report(today: datetime):
             stmt = (
                 select(OrderFoodORM)
                 .options(selectinload(OrderFoodORM.foods))
-                .where(OrderFoodORM.created_at == today)
+                .where(OrderFoodORM.created_at >= today, OrderFoodORM.created_at < tomorrow)
                 .order_by(OrderFoodORM.table_id)
             )
             orders = session.execute(stmt).scalars().all()
