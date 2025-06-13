@@ -3,6 +3,9 @@ import json, os
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
 from dotenv import load_dotenv
+
+from handlers.command_handler import set_bot_commands
+
 load_dotenv()
 
 from aiogram import Bot, Dispatcher
@@ -48,6 +51,7 @@ async def main():
     # Base.metadata.drop_all(bind=engine)  # Удаляет все таблицы
     # Base.metadata.create_all(bind=engine)  # Создает их заново по моделям
     # await create_table()
+    await set_bot_commands(bot)
     await bot.delete_webhook(drop_pending_updates=True)
     await dp.start_polling(bot)
 
