@@ -26,6 +26,7 @@ async def create_report_period(start_date: datetime, end_date: datetime):
                     "Официант": order.created_waiter,
                     "Заказ": " - ".join([food.food for food in order.foods]),
                     "Чек": sum([int(food.price_per_unit) for food in order.foods]),
+                    "Дата создания": order.created_at,
                 }
             print(orders_dt)
             return orders_dt
