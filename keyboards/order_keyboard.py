@@ -26,9 +26,7 @@ def get_table_button(amount: int):
 
 def get_order_button(menu):
     builder = ReplyKeyboardBuilder()
-    builder.add(KeyboardButton(text="/stop"))
     builder.add(KeyboardButton(text="save"))
-    builder.add(KeyboardButton(text="/start"))
 
     for food in menu.values():
         builder.add(KeyboardButton(text=str(food["name"])))
@@ -79,11 +77,11 @@ def get_order_status_keyboard(order_creator_id: int):
         callback_data=EditOrderStatusCallback(status="Не готов", order_creator_id=order_creator_id
                                               )
     )
-    builder.button(
-        text="💤 Заказ выполнен",
-        callback_data=EditOrderStatusCallback(status="Заказ выполнен", order_creator_id=order_creator_id
-                                              )
-    )
+    # builder.button(
+    #     text="💤 Заказ выполнен",
+    #     callback_data=EditOrderStatusCallback(status="Заказ выполнен", order_creator_id=order_creator_id
+    #                                           )
+    # )
 
     # Выравниваем кнопки по 4 в ряд, чтобы получилось 4 + 1
     builder.adjust(4)

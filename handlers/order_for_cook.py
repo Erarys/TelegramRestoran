@@ -20,7 +20,7 @@ async def edit_order_status(callback: CallbackQuery, callback_data: EditOrderSta
     try:
         await callback.message.edit_text(text, reply_markup=get_order_status_keyboard(callback_data.order_creator_id))
     except TelegramBadRequest:
-        await callback.answer("Сообщение отправлено")
+        await callback.answer("...")
     await callback.answer()
 
 
@@ -30,5 +30,5 @@ async def edit_order_status(callback: CallbackQuery, callback_data: EditOrderSta
                 callback_data.order_creator_id,
                 text=text + f"\n<b>{callback.from_user.first_name}:</b> Прошу забрать заказ🚨🚨🚨"
             )
-        elif callback_data.status == "Заказ выполнен":
-            await callback.message.delete()
+        # elif callback_data.status == "Заказ выполнен":
+        #     await callback.message.delete()
