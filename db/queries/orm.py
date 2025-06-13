@@ -84,6 +84,7 @@ async def create_food_report(today: datetime, tomorrow: datetime, food_names: li
                 orders_dt[order.id] = {
                     "Номер стола": order.table_id,
                     "Заказ": ", ".join([f"{food.food} * {food.count}" for food in filtered_foods]),
+                    "Дата создания": order.created_at,
                     "Сумма": sum(food.price_per_unit * food.count for food in filtered_foods),
                     "Доля шашлычника": sum(200 * food.count for food in filtered_foods),
                 }
