@@ -8,7 +8,8 @@ from aiogram.types import Message, ReplyKeyboardMarkup, CallbackQuery
 from aiogram.types.input_file import FSInputFile
 
 from db.queries.check_get import get_menu
-from db.queries.orm import create_report, create_report_period, fill_table, fill_food_menu, delete_menu
+from db.queries.orm import create_report, create_report_period, fill_table, fill_food_menu, delete_menu, \
+    create_food_report
 from filters.base_filters import IsAdmin
 from keyboards.admin_keyboard import get_menu_button, FoodDeleteCallback
 
@@ -57,6 +58,12 @@ def excel_work(orders_df, excel_path):
 
         ws.column_dimensions[col_letter].width = max_length + 2  # небольшой отступ
 
+    # 🎨 Заливка для последней строки
+    last_row_fill = PatternFill(start_color="CCFFCC", end_color="CCFFCC", fill_type="solid")  # светло-зелёный
+
+    for cell in ws[ws.max_row]:  # последняя строка
+        cell.fill = last_row_fill
+
     # Сохраняем обновлённый файл
     wb.save(excel_path)
 
@@ -79,7 +86,7 @@ async def create_order_report(message: Message, command: CommandObject):
         tomorrow = today + timedelta(days=1)
         file_path = f"reports/report_{today:%Y%m%d}.xlsx"
 
-        orders_dt = await create_report(today, tomorrow)
+        orders_dt: dict = await create_report(today, tomorrow)
 
 
     orders_dt["Итого"] = {
@@ -91,6 +98,24 @@ async def create_order_report(message: Message, command: CommandObject):
     document = FSInputFile(file_path)
     await message.bot.send_document(message.chat.id, document)
 
+@router.message(Command("report_food"))
+async def report_food(message: Message):
+    today = datetime.today().replace(hour=0, minute=0, second=0, microsecond=0)
+    tomorrow = today + timedelta(days=1)
+    file_path = f"reports/report_food{today:%Y%m%d}.xlsx"
+
+    orders_dt: dict = await create_food_report(today, tomorrow, ["Шашлык Утка", "Шашлык Баранина"])
+
+    orders_dt["Итого"] = {
+        "Сумма": sum([value["Сумма"] for value in orders_dt.values()]),
+        "Доля шашлычника": sum([value["Доля шашлычника"] for value in orders_dt.values()]),
+    }
+
+    orders_df = pd.DataFrame.from_dict(orders_dt, orient='index')  # ключи 10, 11 станут индексами
+    excel_work(orders_df, file_path)
+
+    document = FSInputFile(file_path)
+    await message.bot.send_document(message.chat.id, document)
 
 @router.message(Command("add_table"))
 async def restart_order(message: Message, command: CommandObject):

@@ -32,7 +32,7 @@ async def create_report_period(start_date: datetime, end_date: datetime):
             return orders_dt
 
 
-async def create_report(today: datetime, tomorrow: datetime):
+async def create_report(today: datetime, tomorrow: datetime) -> dict:
     with factory_session() as session:
         with session.begin():
             orders_dt = dict()
@@ -54,6 +54,42 @@ async def create_report(today: datetime, tomorrow: datetime):
                 }
 
             return orders_dt
+
+async def create_food_report(today: datetime, tomorrow: datetime, food_names: list[str]):
+    with factory_session() as session:
+        with session.begin():
+            orders_dt = dict()
+
+            stmt = (
+                select(OrderFoodORM)
+                .join(OrderFoodORM.foods)
+                .options(selectinload(OrderFoodORM.foods))
+                .where(
+                    OrderFoodORM.created_at >= today,
+                    OrderFoodORM.created_at < tomorrow,
+                    FoodsORM.food.in_(food_names)
+                )
+                .order_by(OrderFoodORM.table_id)
+            )
+
+            orders = session.execute(stmt).scalars().unique().all()
+
+            for order in orders:
+                # отфильтровать блюда в заказе вручную
+                filtered_foods = [food for food in order.foods if food.food in food_names]
+
+                if not filtered_foods:
+                    continue  # если после фильтрации ничего не осталось — пропускаем
+
+                orders_dt[order.id] = {
+                    "Номер стола": order.table_id,
+                    "Заказ": ", ".join([f"{food.food} * {food.count}" for food in filtered_foods]),
+                    "Сумма": sum(food.price_per_unit * food.count for food in filtered_foods),
+                    "Доля шашлычника": sum(200 * food.count for food in filtered_foods),
+                }
+
+            return orders_dt
+
 
 
 async def process_table_order(table_id: int, foods: dict, waiter_name: str, message_id: int):
