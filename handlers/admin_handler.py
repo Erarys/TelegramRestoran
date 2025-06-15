@@ -147,7 +147,7 @@ async def restart_table_handler(message: Message):
 @router.message(Command("update_menu"))
 async def update_menu(message: Message, state: FSMContext):
     await state.clear()
-    menu: dict = await get_menu()
+    menu: dict = await get_menu(0, 10000)
 
     for id in menu.keys():
         await message.answer(
