@@ -27,6 +27,7 @@ def get_table_button(amount: int):
 def get_order_button(menu):
     builder = ReplyKeyboardBuilder()
     builder.add(KeyboardButton(text="save"))
+    builder.add(KeyboardButton(text="Напитки 🥤"))
 
     for food in menu.values():
         builder.add(KeyboardButton(text=str(food["name"])))
@@ -35,6 +36,14 @@ def get_order_button(menu):
     builder.adjust(3)
     return builder.as_markup()
 
+
+def get_drinks_button():
+    builder = ReplyKeyboardBuilder()
+    builder.add(KeyboardButton(text="Кока Кола2л"))
+
+
+    builder.adjust(3)
+    return builder.as_markup()
 
 def get_count_button():
     builder = ReplyKeyboardBuilder()

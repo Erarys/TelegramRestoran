@@ -24,7 +24,7 @@ from keyboards.order_keyboard import (
     get_count_button,
     get_order_option_button,
     TableCallback,
-    get_order_status_keyboard
+    get_order_status_keyboard, get_drinks_button
 )
 
 router = Router()
@@ -44,6 +44,7 @@ def format_order_text(table_id: str, foods: dict) -> str:
     text = "\n".join(f"• {name}: {count}шт" for name, count in foods.items())
     return f"<b>Стол:</b> {table_id}\n\n{text}"
 
+
 def get_diff(new: dict, old: dict) -> dict:
     foods = {}
     for key in new:
@@ -57,6 +58,7 @@ def get_diff(new: dict, old: dict) -> dict:
         for name, count in foods.items()
     )
     return text
+
 
 @router.message(Command("stop"), OrderForm())
 async def cancel_create_order(message: Message, state: FSMContext):
@@ -140,11 +142,13 @@ async def food_selection(message: Message, state: FSMContext):
     table_id = order.get("table_id")
 
     if text == "save":
+        if foods == {}:
+            await message.answer("<b>Вы ничего не выбрали❗❗️❗️️</b>")
+            return
         order_text = format_order_text(table_id, foods)
 
         # Выбираем имя или фамилию работника (выбираем не None)
         waiter_name = message.from_user.first_name or message.from_user.last_name
-
 
         if not await check_free_table(table_id):
             msg_id = await get_table_order_message(table_id)
@@ -160,7 +164,6 @@ async def food_selection(message: Message, state: FSMContext):
                 text=f"{order_text}\n\nПохоже официант изменил меню👀 \n{text}\n\nСтатус заказа: Не готов",
                 reply_markup=get_order_status_keyboard(message.from_user.id)
             )
-
         else:
             msg = await message.bot.send_message(
                 -4951332350,
@@ -177,7 +180,9 @@ async def food_selection(message: Message, state: FSMContext):
         amount = await get_table_amount()
         await message.answer(order_text, reply_markup=get_table_button(amount))
         return
-
+    elif text == "Напитки 🥤":
+        await message.answer("<b>Напитки:</b>", reply_markup=get_drinks_button())
+        return
     if foods.get(text, None) is None:
         foods[text] = 0
 
