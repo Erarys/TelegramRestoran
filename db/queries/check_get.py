@@ -94,9 +94,10 @@ async def get_table_order(table_id):
         return bill
 
 # ✅ Получение меню
-async def get_menu():
+async def get_menu(price_from: int, price_to: int) -> dict:
     async with factory_session() as session:
-        result = await session.execute(select(MenuORM))
+        stmt = select(MenuORM).where(MenuORM.price.between(price_from, price_to))
+        result = await session.execute(stmt)
         foods = result.scalars().all()
 
         return {
@@ -105,6 +106,7 @@ async def get_menu():
                 "price": food.price
             } for food in foods
         }
+
 
 # ✅ Подсчёт количества столов
 async def get_table_amount():
