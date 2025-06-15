@@ -9,7 +9,7 @@ from aiogram.types.input_file import FSInputFile
 
 from db.queries.check_get import get_menu
 from db.queries.orm import create_report, create_report_period, fill_table, fill_food_menu, delete_menu, \
-    create_food_report
+    create_food_report, restart_table
 from filters.base_filters import IsAdmin
 from keyboards.admin_keyboard import get_menu_button, FoodDeleteCallback
 
@@ -70,7 +70,6 @@ def excel_work(orders_df, excel_path):
 
 @router.message(Command("report"))
 async def create_order_report(message: Message, command: CommandObject):
-
     if command.args is not None:
         try:
             start_day, end_day = command.args.split()
@@ -88,7 +87,6 @@ async def create_order_report(message: Message, command: CommandObject):
 
         orders_dt: dict = await create_report(today, tomorrow)
 
-
     orders_dt["Итого"] = {
         "Чек": sum([value["Чек"] for value in orders_dt.values()])
     }
@@ -97,6 +95,7 @@ async def create_order_report(message: Message, command: CommandObject):
 
     document = FSInputFile(file_path)
     await message.bot.send_document(message.chat.id, document)
+
 
 @router.message(Command("report_food"))
 async def report_food(message: Message):
@@ -117,6 +116,7 @@ async def report_food(message: Message):
     document = FSInputFile(file_path)
     await message.bot.send_document(message.chat.id, document)
 
+
 @router.message(Command("add_table"))
 async def restart_order(message: Message, command: CommandObject):
     args = command.args
@@ -136,6 +136,12 @@ async def delete_food(callback: CallbackQuery, callback_data: FoodDeleteCallback
     food_id = callback_data.food_id
     await delete_menu(food_id)
     await callback.message.edit_text("Удалено", reply_markup=None)
+
+
+@router.message(Command("restart"))
+async def restart_table_handler(message: Message):
+    await restart_table()
+    await message.answer("Все столы были сброшены 🚮")
 
 
 @router.message(Command("update_menu"))

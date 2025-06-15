@@ -1,70 +1,103 @@
 from datetime import datetime
-
-from sqlalchemy import desc, select
+from sqlalchemy import desc, select, func
+from sqlalchemy.orm import selectinload
 from db.database import engine, Base, factory_session
 from db.models import OrderFoodORM, FoodsORM, MenuORM, TableORM
 
-
+# ✅ Получение свободного стола
 async def check_free_table(table_id):
-    with factory_session() as session:
-        with session.begin():
-            table = session.query(TableORM).filter_by(number=table_id).first()
-            return table.is_available
+    async with factory_session() as session:
+        result = await session.execute(
+            select(TableORM).where(TableORM.number == table_id)
+        )
+        table = result.scalar_one_or_none()
+        return bool(table and table.is_available)
 
-
+# ✅ Получение списка блюд по столу
 async def get_table_foods(table_id) -> dict:
-    with factory_session() as session:
-        with session.begin():
-            table = session.query(TableORM).filter_by(number=table_id).first()
-            order = (
-                session.query(OrderFoodORM)
-                .filter_by(table=table)
-                .order_by(desc(OrderFoodORM.created_at))
-                .first()
-            )
+    async with factory_session() as session:
+        table_result = await session.execute(
+            select(TableORM).where(TableORM.number == table_id)
+        )
+        table = table_result.scalar_one_or_none()
 
-            return {food.food: food.count for food in order.foods}
+        if not table:
+            return {}
 
+        order_result = await session.execute(
+            select(OrderFoodORM)
+            .options(selectinload(OrderFoodORM.foods))  # загрузка связанных блюд
+            .where(OrderFoodORM.table == table)
+            .order_by(desc(OrderFoodORM.created_at))
+            .limit(1)
+        )
+        order = order_result.scalar_one_or_none()
+
+        if not order:
+            return {}
+
+        return {food.food: food.count for food in order.foods}
+
+# ✅ Получение message_id по последнему заказу
 async def get_table_order_message(table_id):
-    with factory_session() as session:
-        with session.begin():
-            table = session.query(TableORM).filter_by(number=table_id).first()
-            order = (
-                session.query(OrderFoodORM)
-                .filter_by(table=table)
-                .order_by(desc(OrderFoodORM.created_at))
-                .first()
-            )
-            return order.message_id
+    async with factory_session() as session:
+        table_result = await session.execute(
+            select(TableORM).where(TableORM.number == table_id)
+        )
+        table = table_result.scalar_one_or_none()
 
+        if not table:
+            return None
 
+        order_result = await session.execute(
+            select(OrderFoodORM)
+            .where(OrderFoodORM.table == table)
+            .order_by(desc(OrderFoodORM.created_at))
+            .limit(1)
+        )
+        order = order_result.scalar_one_or_none()
+
+        return order.message_id if order else None
+
+# ✅ Получение счёта
 async def get_table_order(table_id):
-    with factory_session() as session:
-        with session.begin():
-            table = session.query(TableORM).filter_by(number=table_id).first()
-            order = (
-                session.query(OrderFoodORM)
-                .filter_by(table=table)
-                .order_by(desc(OrderFoodORM.created_at))
-                .first()
-            )
+    async with factory_session() as session:
+        table_result = await session.execute(
+            select(TableORM).where(TableORM.number == table_id)
+        )
+        table = table_result.scalar_one_or_none()
 
-            bill = {
-                index: {
-                    "name": food.food,
-                    "count": food.count,
-                    "price": food.price_per_unit,
-                }
-                for index, food in enumerate(order.foods, start=1)
+        if not table:
+            return {}
+
+        order_result = await session.execute(
+            select(OrderFoodORM)
+            .options(selectinload(OrderFoodORM.foods))
+            .where(OrderFoodORM.table == table)
+            .order_by(desc(OrderFoodORM.created_at))
+            .limit(1)
+        )
+        order = order_result.scalar_one_or_none()
+
+        if not order:
+            return {}
+
+        bill = {
+            index: {
+                "name": food.food,
+                "count": food.count,
+                "price": food.price_per_unit,
             }
+            for index, food in enumerate(order.foods, start=1)
+        }
 
-            return bill
+        return bill
 
-
+# ✅ Получение меню
 async def get_menu():
-    with factory_session() as session:
-        with session.begin():
-            foods = session.query(MenuORM).all()
+    async with factory_session() as session:
+        result = await session.execute(select(MenuORM))
+        foods = result.scalars().all()
 
         return {
             food.id: {
@@ -73,7 +106,9 @@ async def get_menu():
             } for food in foods
         }
 
-
+# ✅ Подсчёт количества столов
 async def get_table_amount():
-    with factory_session() as session:
-        return session.query(TableORM).count()
+    async with factory_session() as session:
+        result = await session.execute(select(func.count()).select_from(TableORM))
+        count = result.scalar_one()
+        return count

@@ -91,7 +91,7 @@ async def table_action(callback: CallbackQuery, callback_data: TableCallback, st
 @router.message(CommandStart())
 async def start(message: Message, state: FSMContext):
     await state.clear()
-    # message.from_user.first_name
+    # message.from_user.
     amount = await get_table_amount()
     await message.answer(text=f"<b>Введите номер стола:</b>", reply_markup=get_table_button(amount))
     await state.set_state(OrderForm.table_id)
