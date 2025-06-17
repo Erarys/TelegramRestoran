@@ -101,14 +101,13 @@ async def process_table_order(table_id: int, foods: dict, waiter_name: str, mess
             for food_name in foods.keys():
                 result = await session.execute(select(MenuORM).where(MenuORM.food_name == food_name))
                 foods_objects[food_name] = result.scalar_one_or_none()
-            print("food obj", foods_objects)
+
             if table.is_available:
                 food_entries = [
                     FoodsORM(food=food_name, price_per_unit=menu_obj.price, count=count)
                     for food_name, count in foods.items()
                     if (menu_obj := foods_objects.get(food_name))
                 ]
-                print("food entries", food_entries)
                 order = OrderFoodORM(table=table, created_waiter=waiter_name, message_id=message_id)
                 order.foods.extend(food_entries)
                 session.add(order)
@@ -117,6 +116,7 @@ async def process_table_order(table_id: int, foods: dict, waiter_name: str, mess
             else:
                 stmt = (
                     select(OrderFoodORM)
+                    .options(selectinload(OrderFoodORM.foods))  # <- вот это важно!
                     .where(OrderFoodORM.table_id == table.id, OrderFoodORM.created_waiter == waiter_name)
                     .order_by(desc(OrderFoodORM.created_at))
                     .limit(1)
