@@ -40,9 +40,9 @@ class OrderForm(StatesGroup):
     order_foods: dict = State()
 
 
-def format_order_text(table_id: str, foods: dict) -> str:
+def format_order_text(table_id: str, foods: dict, full_name="") -> str:
     text = "\n".join(f"• {name}: {count}шт" for name, count in foods.items())
-    return f"<b>Стол:</b> {table_id}\n\n{text}"
+    return f"<b>Стол:</b> {table_id}\nОфициант: {full_name}\n\n{text}"
 
 
 def get_diff(new: dict, old: dict) -> dict:
@@ -145,7 +145,8 @@ async def food_selection(message: Message, state: FSMContext):
         if foods == {}:
             await message.answer("<b>Вы ничего не выбрали❗❗️❗️️</b>")
             return
-        order_text = format_order_text(table_id, foods)
+        f_name = message.from_user.full_name
+        order_text = format_order_text(table_id, foods, full_name=f_name)
 
         # Выбираем имя или фамилию работника (выбираем не None)
         waiter_name = message.from_user.first_name or message.from_user.last_name
@@ -188,8 +189,8 @@ async def food_selection(message: Message, state: FSMContext):
         foods[text] = 0
 
     await state.update_data(order_foods=foods, food=text)
-
-    order_text = format_order_text(table_id, foods)
+    f_name = message.from_user.full_name
+    order_text = format_order_text(table_id, foods, full_name=f_name)
     await message.answer(order_text, reply_markup=get_count_button())
     await state.set_state(OrderForm.count)
 
@@ -219,8 +220,8 @@ async def food_count_input(message: Message, state: FSMContext):
         return
 
     await state.update_data(order_foods=foods)
-
-    order_text = format_order_text(table_id, foods)
+    f_name = message.from_user.full_name
+    order_text = format_order_text(table_id, foods, full_name=f_name)
     menu = await get_menu(1500, 5000)
     await message.answer(text=order_text, reply_markup=get_order_button(menu))
     await state.set_state(OrderForm.food)
