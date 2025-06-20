@@ -1,53 +1,23 @@
-from dotenv import load_dotenv
-
-load_dotenv()
+from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
+from sqlalchemy.orm import DeclarativeBase
+from sqlalchemy import select
 
 import os
-from logging.config import fileConfig
-from sqlalchemy import create_engine, pool
-from alembic import context
-from db.base import Base
 
-
-# this is the Alembic Config object
-config = context.config
-
-# Logging
-if config.config_file_name is not None:
-    fileConfig(config.config_file_name)
-
-# MetaData for 'autogenerate'
-target_metadata = Base.metadata
-
-# 🧠 Создаём обычный sync engine только для Alembic
-DB_URL = (
-    f"mysql+pymysql://{os.getenv('DB_USER')}:{os.getenv('DB_PASS')}"
-    f"@{os.getenv('DB_HOST')}:{os.getenv('DB_PORT')}/{os.getenv('DB_NAME')}"
+MY_URL = "mysql+aiomysql://{USER}:{PASS}@{HOST}:{PORT}/{NAME}".format(
+    HOST=os.getenv("DB_HOST"),
+    PORT=os.getenv("DB_PORT"),
+    USER=os.getenv("DB_USER"),
+    PASS=os.getenv("DB_PASS"),
+    NAME=os.getenv("DB_NAME")
 )
 
-def run_migrations_offline() -> None:
-    context.configure(
-        url=DB_URL,
-        target_metadata=target_metadata,
-        literal_binds=True,
-        dialect_opts={"paramstyle": "named"},
-    )
-    with context.begin_transaction():
-        context.run_migrations()
+engine = create_async_engine(
+    url=MY_URL,
+    echo=True
+)
 
-def run_migrations_online() -> None:
-    connectable = create_engine(DB_URL, poolclass=pool.NullPool)
+factory_session = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
 
-    with connectable.connect() as connection:
-        context.configure(
-            connection=connection,
-            target_metadata=target_metadata,
-            compare_type=True
-        )
-        with context.begin_transaction():
-            context.run_migrations()
-
-if context.is_offline_mode():
-    run_migrations_offline()
-else:
-    run_migrations_online()
+class Base(DeclarativeBase):
+    pass
