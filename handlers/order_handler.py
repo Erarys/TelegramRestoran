@@ -1,3 +1,5 @@
+from logging import exception
+
 from aiogram import Router, F
 from aiogram.filters import CommandStart, Command
 from aiogram.fsm.context import FSMContext
@@ -58,6 +60,15 @@ def get_diff(new: dict, old: dict) -> dict:
         for name, count in foods.items()
     )
     return text
+
+
+def filter_foods(foods: dict, filter_words: list) -> dict:
+    filtered_foods = dict()
+    for key in foods.keys():
+        if any(word in key for word in filter_words):
+            filtered_foods[key] = foods[key]
+
+    return filtered_foods
 
 
 @router.message(Command("stop"), OrderForm())
@@ -145,7 +156,13 @@ async def food_selection(message: Message, state: FSMContext):
         if foods == {}:
             await message.answer("<b>Вы ничего не выбрали❗❗️❗️️</b>")
             return
+
         f_name = message.from_user.full_name
+        foods_shashlik = filter_foods(foods, ["Шашлык"])
+        foods_lagman = filter_foods(foods, ["Лагман"])
+        msg_shashlik_id = 0
+        msg_lagman_id = 0
+
         order_text = format_order_text(table_id, foods, full_name=f_name)
 
         # Выбираем имя или фамилию работника (выбираем не None)
@@ -157,6 +174,11 @@ async def food_selection(message: Message, state: FSMContext):
             foods_from_db = await get_table_foods(table_id)
             try:
                 await message.bot.delete_message(-4951332350, msg_id)
+                if msg_id_shashlik != 0:
+                    await message.bot.delete_message(-4921594223, msg_id_shashlik)
+                if msg_id_lagman != 0:
+                    await message.bot.delete_message(-4907754244, msg_id_lagman)
+
             except:
                 print("Message not found")
 
@@ -167,17 +189,30 @@ async def food_selection(message: Message, state: FSMContext):
                 reply_markup=get_order_status_keyboard(message.from_user.id)
             )
 
-            msg_shashlik = await message.bot.send_message(
-                -4921594223,
-                text=f"{order_text}\n\nПохоже официант изменил меню👀 \n{text}\n\nСтатус заказа: Не готов",
-                reply_markup=get_order_status_keyboard(message.from_user.id)
-            )
+            if foods_shashlik != {}:
+                order_shashlik_text = format_order_text(table_id, foods_shashlik, full_name=f_name)
+                foods_db_shashlik = filter_foods(foods_from_db, ["Шашлык"])
+                text_shashlik = get_diff(foods_shashlik, foods_db_shashlik)
+                if text_shashlik:
+                    msg_shashlik = await message.bot.send_message(
+                        -4921594223,
+                        text=f"{order_shashlik_text}\n\nПохоже официант изменил меню👀 \n{text_shashlik}\n\nСтатус заказа: Не готов",
+                        reply_markup=get_order_status_keyboard(message.from_user.id)
+                    )
+                    msg_shashlik_id = msg_shashlik.message_id
 
-            msg_lagman = await message.bot.send_message(
-                -4907754244,
-                text=f"{order_text}\n\nПохоже официант изменил меню👀 \n{text}\n\nСтатус заказа: Не готов",
-                reply_markup=get_order_status_keyboard(message.from_user.id)
-            )
+            if foods_lagman != {}:
+                order_lagman_text = format_order_text(table_id, foods_lagman, full_name=f_name)
+                foods_db_lagman = filter_foods(foods_from_db, ["Лагман"])
+                text_lagman = get_diff(foods_lagman, foods_db_lagman)
+
+                if text_lagman:
+                    msg_lagman = await message.bot.send_message(
+                        -4907754244,
+                        text=f"{order_lagman_text}\n\nПохоже официант изменил меню👀 \n{text_lagman}\n\nСтатус заказа: Не готов",
+                        reply_markup=get_order_status_keyboard(message.from_user.id)
+                    )
+                    msg_lagman_id = msg_lagman.message_id
 
         else:
             msg = await message.bot.send_message(
@@ -186,17 +221,22 @@ async def food_selection(message: Message, state: FSMContext):
                 reply_markup=get_order_status_keyboard(message.from_user.id)
             )
 
-            msg_shashlik = await message.bot.send_message(
-                -4921594223,
-                text=f"{order_text}\n\nСтатус заказа: Не готов",
-                reply_markup=get_order_status_keyboard(message.from_user.id)
-            )
-
-            msg_lagman = await message.bot.send_message(
-                -4907754244,
-                text=f"{order_text}\n\nСтатус заказа: Не готов",
-                reply_markup=get_order_status_keyboard(message.from_user.id)
-            )
+            if foods_shashlik != {}:
+                order_shashlik_text = format_order_text(table_id, foods_shashlik, full_name=f_name)
+                msg_shashlik = await message.bot.send_message(
+                    -4921594223,
+                    text=f"{order_shashlik_text}\n\nСтатус заказа: Не готов",
+                    reply_markup=get_order_status_keyboard(message.from_user.id)
+                )
+                msg_shashlik_id = msg_shashlik.message_id
+            if foods_lagman != {}:
+                order_lagman_text = format_order_text(table_id, foods_lagman, full_name=f_name)
+                msg_lagman = await message.bot.send_message(
+                    -4907754244,
+                    text=f"{order_lagman_text}\n\nСтатус заказа: Не готов",
+                    reply_markup=get_order_status_keyboard(message.from_user.id)
+                )
+                msg_lagman_id = msg_lagman.message_id
         # await message.bot.send_message(-4951332350, text, reply_to_message_id=msg.message_id)
         # Тут обращаемся к базе и добавляем заказ или обновляем уже существующий
         try:
@@ -205,11 +245,11 @@ async def food_selection(message: Message, state: FSMContext):
                 foods,
                 waiter_name,
                 msg.message_id,
-                msg_shashlik.message_id,
-                msg_lagman.message_id
+                msg_shashlik_id,
+                msg_lagman_id
             )
-        except:
-            await message.answer("Ошибка ORM❗️")
+        except BaseException as exc:
+            await message.answer(f"Ошибка ORM❗️\n {exc}")
 
         await state.clear()
         await state.set_state(OrderForm.table_id)
