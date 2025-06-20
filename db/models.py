@@ -26,7 +26,8 @@ class OrderFoodORM(Base):
     created_waiter: Mapped[str] = mapped_column(String(length=100))
     created_at: Mapped[datetime] = mapped_column(default=datetime.utcnow)
     message_id: Mapped[int]
-
+    message_id_shashlik: Mapped[int]
+    message_id_lagman: Mapped[int]
 
     table: Mapped["TableORM"] = relationship(back_populates="orders")
 

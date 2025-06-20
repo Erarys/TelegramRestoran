@@ -151,8 +151,9 @@ async def food_selection(message: Message, state: FSMContext):
         # Выбираем имя или фамилию работника (выбираем не None)
         waiter_name = message.from_user.first_name or message.from_user.last_name
 
+        # Функционал отправки заказов поварам
         if not await check_free_table(table_id):
-            msg_id = await get_table_order_message(table_id)
+            msg_id, msg_id_shashlik, msg_id_lagman = await get_table_order_message(table_id)
             foods_from_db = await get_table_foods(table_id)
             try:
                 await message.bot.delete_message(-4951332350, msg_id)
@@ -165,15 +166,51 @@ async def food_selection(message: Message, state: FSMContext):
                 text=f"{order_text}\n\nПохоже официант изменил меню👀 \n{text}\n\nСтатус заказа: Не готов",
                 reply_markup=get_order_status_keyboard(message.from_user.id)
             )
+
+            msg_shashlik = await message.bot.send_message(
+                -4921594223,
+                text=f"{order_text}\n\nПохоже официант изменил меню👀 \n{text}\n\nСтатус заказа: Не готов",
+                reply_markup=get_order_status_keyboard(message.from_user.id)
+            )
+
+            msg_lagman = await message.bot.send_message(
+                -4907754244,
+                text=f"{order_text}\n\nПохоже официант изменил меню👀 \n{text}\n\nСтатус заказа: Не готов",
+                reply_markup=get_order_status_keyboard(message.from_user.id)
+            )
+
         else:
             msg = await message.bot.send_message(
                 -4951332350,
                 text=f"{order_text}\n\nСтатус заказа: Не готов",
                 reply_markup=get_order_status_keyboard(message.from_user.id)
             )
+
+            msg_shashlik = await message.bot.send_message(
+                -4921594223,
+                text=f"{order_text}\n\nСтатус заказа: Не готов",
+                reply_markup=get_order_status_keyboard(message.from_user.id)
+            )
+
+            msg_lagman = await message.bot.send_message(
+                -4907754244,
+                text=f"{order_text}\n\nСтатус заказа: Не готов",
+                reply_markup=get_order_status_keyboard(message.from_user.id)
+            )
         # await message.bot.send_message(-4951332350, text, reply_to_message_id=msg.message_id)
-        # Тут обращаемся к базе и обновляем таблицу
-        await process_table_order(table_id, foods, waiter_name, msg.message_id)
+        # Тут обращаемся к базе и добавляем заказ или обновляем уже существующий
+        try:
+            await process_table_order(
+                table_id,
+                foods,
+                waiter_name,
+                msg.message_id,
+                msg_shashlik.message_id,
+                msg_lagman.message_id
+            )
+        except:
+            await message.answer("Ошибка ORM❗️")
+
         await state.clear()
         await state.set_state(OrderForm.table_id)
 

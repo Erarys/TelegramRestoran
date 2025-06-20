@@ -89,7 +89,15 @@ async def create_food_report(today: datetime, tomorrow: datetime, food_names: li
         return orders_dt
 
 
-async def process_table_order(table_id: int, foods: dict, waiter_name: str, message_id: int):
+async def process_table_order(
+        table_id: int,
+        foods: dict,
+        waiter_name: str,
+        message_id: int,
+        message_id_shashlik: int,
+        message_id_lagman: int
+    ):
+
     async with factory_session() as session:
         async with session.begin():
             result = await session.execute(select(TableORM).where(TableORM.number == table_id))
@@ -108,7 +116,14 @@ async def process_table_order(table_id: int, foods: dict, waiter_name: str, mess
                     for food_name, count in foods.items()
                     if (menu_obj := foods_objects.get(food_name))
                 ]
-                order = OrderFoodORM(table=table, created_waiter=waiter_name, message_id=message_id)
+                order = OrderFoodORM(
+                    table=table,
+                    created_waiter=waiter_name,
+                    message_id=message_id,
+                    message_id_shashlik=message_id_shashlik,
+                    message_id_lagman=message_id_lagman,
+                )
+
                 order.foods.extend(food_entries)
                 session.add(order)
                 table.is_available = False
@@ -127,6 +142,8 @@ async def process_table_order(table_id: int, foods: dict, waiter_name: str, mess
                     raise ValueError(f"No active order found for table {table_id}")
 
                 order.message_id = message_id
+                order.message_id_shashlik = message_id_shashlik
+                order.message_id_lagman = message_id_lagman
                 existing_foods = {food.food: food for food in order.foods}
 
                 for food_name, count in foods.items():
@@ -152,7 +169,6 @@ async def clear_table(table_id):
                 table.is_available = True
 
 
-
 async def delete_menu(id: int):
     async with factory_session() as session:
         async with session.begin():
@@ -160,7 +176,6 @@ async def delete_menu(id: int):
             food = result.scalar_one_or_none()
             if food:
                 await session.delete(food)
-
 
 
 async def fill_food_menu(name, price):
@@ -174,7 +189,6 @@ async def fill_food_menu(name, price):
                 return True
 
 
-
 async def fill_table(amount: int):
     async with factory_session() as session:
         async with session.begin():
@@ -185,7 +199,6 @@ async def fill_table(amount: int):
                     session.add(TableORM(number=number))
 
 
-
 async def restart_table():
     async with factory_session() as session:
         async with session.begin():
@@ -193,4 +206,3 @@ async def restart_table():
             tables = result.scalars().all()
             for table in tables:
                 table.is_available = True
-

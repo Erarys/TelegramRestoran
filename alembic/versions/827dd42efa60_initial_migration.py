@@ -1,8 +1,8 @@
 """initial migration
 
-Revision ID: 2f5ab2502a16
+Revision ID: 827dd42efa60
 Revises: 
-Create Date: 2025-05-31 19:42:55.472027
+Create Date: 2025-06-20 19:49:27.169093
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = '2f5ab2502a16'
+revision: str = '827dd42efa60'
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -24,7 +24,7 @@ def upgrade() -> None:
     op.create_table('menu',
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('food_name', sa.String(length=100), nullable=False),
-    sa.Column('price', sa.Float(), nullable=False),
+    sa.Column('price', sa.Integer(), nullable=False),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('food_name')
     )
@@ -40,6 +40,9 @@ def upgrade() -> None:
     sa.Column('table_id', sa.Integer(), nullable=False),
     sa.Column('created_waiter', sa.String(length=100), nullable=False),
     sa.Column('created_at', sa.DateTime(), nullable=False),
+    sa.Column('message_id', sa.Integer(), nullable=False),
+    sa.Column('message_id_shashlik', sa.Integer(), nullable=False),
+    sa.Column('message_id_lagman', sa.Integer(), nullable=False),
     sa.ForeignKeyConstraint(['table_id'], ['table.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
@@ -47,7 +50,7 @@ def upgrade() -> None:
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('food', sa.String(length=100), nullable=False),
     sa.Column('count', sa.Integer(), nullable=False),
-    sa.Column('price_per_unit', sa.Float(), nullable=False),
+    sa.Column('price_per_unit', sa.Integer(), nullable=False),
     sa.Column('order_id', sa.Integer(), nullable=False),
     sa.ForeignKeyConstraint(['order_id'], ['order_food.id'], ),
     sa.PrimaryKeyConstraint('id')
