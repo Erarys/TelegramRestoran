@@ -26,7 +26,8 @@ from keyboards.order_keyboard import (
     get_count_button,
     get_order_option_button,
     TableCallback,
-    get_order_status_keyboard, get_drinks_button
+    get_order_status_keyboard, get_drinks_button, choose_food_type, choose_shashlik_food, choose_lagman_food,
+    choose_dishes_food, choose_selad_food, choose_garnish_food
 )
 
 router = Router()
@@ -37,7 +38,9 @@ router.message.filter(IsWaiter())
 
 class OrderForm(StatesGroup):
     table_id: str = State()
+    food_type: str = State()
     food: str = State()
+    garnish: str = State()
     count: str = State()
     order_foods: dict = State()
 
@@ -140,10 +143,32 @@ async def table_input(message: Message, state: FSMContext):
         )
     else:
         await state.update_data(table_id=message.text)
-        menu = await get_menu(1500, 5000)
-        await message.answer(text="<b>Выберите меню:</b>", reply_markup=get_order_button(menu))
-        await state.set_state(OrderForm.food)
+        # menu = await get_menu(1500, 5000)
+        # await message.answer(text="<b>Выберите меню:</b>", reply_markup=get_order_button(menu))
+        await message.answer(text="<b>Выберите категорию</b>", reply_markup=choose_food_type())
+        await state.set_state(OrderForm.food_type)
 
+
+@router.message(F.text, OrderForm.food_type)
+async def food_type(message: Message, state: FSMContext):
+    text = message.text.strip()
+
+    if text == "Шашлык 🍢":
+        await message.answer("<b>Выберите меню:</b>", reply_markup=choose_shashlik_food())
+    elif text == "Лагман 🍜":
+        await message.answer("<b>Выберите меню:</b>", reply_markup=choose_lagman_food())
+    elif text == "Горячие Блюда 🐦‍🔥":
+        await message.answer("<b>Выберите меню:</b>", reply_markup=choose_dishes_food())
+    elif text == "Блюда с гарниром 🍛":
+        await message.answer("<b>Выберите меню:</b>", reply_markup=choose_garnish_food())
+    elif text == "Салаты 🥗":
+        await message.answer("<b>Выберите меню:</b>", reply_markup=choose_selad_food())
+
+    await state.set_state(OrderForm.food)
+
+# @router.message(F.text, OrderForm.garnish)
+# async def garnish(message: Message, state: FSMContext):
+#     await message.answer()
 
 @router.message(F.text, OrderForm.food)
 async def food_selection(message: Message, state: FSMContext):
@@ -258,10 +283,10 @@ async def food_selection(message: Message, state: FSMContext):
         amount = await get_table_amount()
         await message.answer(order_text, reply_markup=get_table_button(amount))
         return
-    elif text == "Другие товары":
-        menu = await get_menu(0, 1500)
-        await message.answer("<b>Выберите:</b>", reply_markup=get_drinks_button(menu))
-        return
+    # elif text == "Другие товары":
+    #     menu = await get_menu(0, 1500)
+    #     await message.answer("<b>Выберите:</b>", reply_markup=get_drinks_button(menu))
+    #     return
     if foods.get(text, None) is None:
         foods[text] = 0
 
@@ -299,6 +324,7 @@ async def food_count_input(message: Message, state: FSMContext):
     await state.update_data(order_foods=foods)
     f_name = message.from_user.full_name
     order_text = format_order_text(table_id, foods, full_name=f_name)
-    menu = await get_menu(1500, 5000)
-    await message.answer(text=order_text, reply_markup=get_order_button(menu))
-    await state.set_state(OrderForm.food)
+    # menu = await get_menu(1500, 5000)
+    # await message.answer(text=order_text, reply_markup=get_order_button(menu))
+    await message.answer(text=order_text, reply_markup=choose_food_type())
+    await state.set_state(OrderForm.food_type)

@@ -1,6 +1,7 @@
 from aiogram.filters.callback_data import CallbackData
-from aiogram.types import KeyboardButton, InlineKeyboardButton, InlineKeyboardMarkup, CallbackQuery
+from aiogram.types import KeyboardButton, InlineKeyboardButton, InlineKeyboardMarkup, CallbackQuery, ReplyKeyboardMarkup
 from aiogram.utils.keyboard import ReplyKeyboardBuilder, InlineKeyboardBuilder
+
 
 
 class TableCallback(CallbackData, prefix="table"):
@@ -96,3 +97,132 @@ def get_order_status_keyboard(order_creator_id: int):
     # Выравниваем кнопки по 4 в ряд, чтобы получилось 4 + 1
     builder.adjust(4)
     return builder.as_markup()
+
+
+def choose_food_type():
+    kb = [
+        [
+            KeyboardButton(text="Шашлык 🍢"),
+            KeyboardButton(text="Лагман 🍜")
+        ],
+        [
+            KeyboardButton(text="Горячие Блюда 🐦‍🔥"),
+            KeyboardButton(text="Салаты 🥗")
+        ],
+        [
+            KeyboardButton(text="Блюда с гарниром 🍛")
+        ]
+
+    ]
+    keyboard = ReplyKeyboardMarkup(keyboard=kb)
+
+    return keyboard
+
+def choose_shashlik_food():
+    kb = [
+        [
+            KeyboardButton(text="Баранина"),
+            KeyboardButton(text="Утка")
+        ],
+        [
+            KeyboardButton(text="Окорочка")
+        ]
+
+    ]
+    keyboard = ReplyKeyboardMarkup(keyboard=kb)
+
+    return keyboard
+
+def choose_lagman_food():
+    kb = [
+        [
+            KeyboardButton(text="Гуйру"),
+            KeyboardButton(text="Суйру"),
+            KeyboardButton(text="Домашний лагман")
+        ],
+        [
+            KeyboardButton(text="Гуйру цомян"),
+            KeyboardButton(text="Дин-дин"),
+            KeyboardButton(text="Рёбра лагман"),
+        ],
+        [
+            KeyboardButton(text="Могру"),
+            KeyboardButton(text="Хаухуа"),
+            KeyboardButton(text="Фирменный лагман \"Арыс\""),
+        ]
+
+    ]
+    keyboard = ReplyKeyboardMarkup(keyboard=kb)
+
+    return keyboard
+
+def choose_dishes_food():
+    kb = [
+        [
+            KeyboardButton(text="Кызыл пельмен"),
+            KeyboardButton(text="Мампар")
+        ],
+        [
+            KeyboardButton(text="Ет сорпа"),
+            KeyboardButton(text="Домашний пельмен"),
+        ],
+        [
+            KeyboardButton(text="Фри с мясом"),
+        ]
+
+    ]
+    keyboard = ReplyKeyboardMarkup(keyboard=kb)
+
+    return keyboard
+
+def choose_selad_food():
+    kb = [
+        [
+            KeyboardButton(text="Свежий салат"),
+            KeyboardButton(text="Пекинский салат")
+        ],
+        [
+            KeyboardButton(text="Ачучук салат"),
+            KeyboardButton(text="Хрустящий баклажан"),
+        ]
+
+    ]
+    keyboard = ReplyKeyboardMarkup(keyboard=kb)
+
+    return keyboard
+
+def choose_garnish_food():
+    kb = [
+        [
+            KeyboardButton(text="Мясо по тайский"),
+            KeyboardButton(text="Мушуру сай"),
+        ],
+        [
+            KeyboardButton(text="Могуру сай"),
+            KeyboardButton(text="Казан Кебаб"),
+        ],
+        [
+            KeyboardButton(text="Дапанджи"),
+        ]
+
+    ]
+    keyboard = ReplyKeyboardMarkup(keyboard=kb)
+
+    return keyboard
+
+def choose_garnish_additional():
+    kb = [
+        [
+            KeyboardButton(text="Фри"),
+            KeyboardButton(text="Рис"),
+        ],
+        [
+            KeyboardButton(text="Пюре"),
+        ]
+
+    ]
+    keyboard = ReplyKeyboardMarkup(keyboard=kb)
+
+    return keyboard
+
+
