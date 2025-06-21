@@ -70,6 +70,7 @@ def excel_work(orders_df, excel_path):
 
 @router.message(Command("report"))
 async def create_order_report(message: Message, command: CommandObject):
+    await message.answer(f"{message.chat.id}")
     if command.args is not None:
         try:
             start_day, end_day = command.args.split()

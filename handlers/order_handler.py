@@ -177,7 +177,7 @@ async def food_selection(message: Message, state: FSMContext):
                 if msg_id_shashlik != 0:
                     await message.bot.delete_message(-4921594223, msg_id_shashlik)
                 if msg_id_lagman != 0:
-                    await message.bot.delete_message(-4907754244, msg_id_lagman)
+                    await message.bot.delete_message(-4815751000, msg_id_lagman)
 
             except:
                 print("Message not found")
@@ -208,7 +208,7 @@ async def food_selection(message: Message, state: FSMContext):
 
                 if text_lagman:
                     msg_lagman = await message.bot.send_message(
-                        -4907754244,
+                        -4815751000,
                         text=f"{order_lagman_text}\n\nПохоже официант изменил меню👀 \n{text_lagman}\n\nСтатус заказа: Не готов",
                         reply_markup=get_order_status_keyboard(message.from_user.id)
                     )
