@@ -238,6 +238,7 @@ def choose_drinks():
         ],
         [
             KeyboardButton(text="Coca-Cola 1л"),
+            KeyboardButton(text="Чай"),
         ]
 
     ]

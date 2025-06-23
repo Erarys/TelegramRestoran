@@ -213,6 +213,7 @@ async def auto_fill(message: Message):
         "Coca-Cola 2л": 1000,
         "Fanta 1л": 700,
         "Coca-Cola 1л": 700,
+        "Чай": 350
     }
 
     dt2 = {
