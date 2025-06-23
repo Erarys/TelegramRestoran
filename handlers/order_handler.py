@@ -68,8 +68,7 @@ def get_diff(new: dict, old: dict) -> dict:
             }
 
     text = "\n".join(
-        f"✅ {name} {food_info['garnish']}: ➕{food_info['count']}шт" if food_info[
-                                                                           'count'] > 0 else f"🔻 {name}: ➖{abs(food_info['count'])}шт"
+        f"✅ {name}: ➕{food_info['count']}шт" if food_info['count'] > 0 else f"🔻 {name}: ➖{abs(food_info['count'])}шт"
         for name, food_info in foods.items()
     )
     return text
@@ -138,12 +137,12 @@ async def table_input(message: Message, state: FSMContext):
             count = food.get("count", 0)
             price = food.get("price", 0)
             name = food.get("name", "—")
-            garnish = food.get("garnish", " ")
+
 
             summary = price * count
             bill_sum += summary
 
-            lines.append(f"{index}) {name} ({garnish}) <i>{count}x{price}</i> = {summary}тг")
+            lines.append(f"{index}) {name} <i>{count}x{price}</i> = {summary}тг")
 
         lines.append(f"\n<i>Итого</i>: {bill_sum}тг")
         text = "\n".join(lines)
@@ -213,7 +212,9 @@ async def food_type(message: Message, state: FSMContext):
         if not await check_free_table(table_id):
             msg_id, msg_id_shashlik, msg_id_lagman = await get_table_order_message(table_id)
             foods_from_db = await get_table_foods(table_id)
+            print("Is it work")
             try:
+                print(msg_id_lagman)
                 await message.bot.delete_message(-4951332350, msg_id)
                 if msg_id_shashlik != 0:
                     await message.bot.delete_message(-4921594223, msg_id_shashlik)
@@ -385,15 +386,14 @@ async def select_garnish(message: Message, state: FSMContext):
     foods = order.get("order_foods", {})
     table_id = order.get("table_id")
     value = foods.pop(food_name, {"count": 0, "garnish": None})
-
-    if foods.get(f"{food_name} ({garnish})", None) is None:
-        foods[f"{food_name} ({garnish})"] = value
+    food_name = f"{food_name} ({garnish})"
+    if foods.get(food_name, None) is None:
+        foods[food_name] = value
     else:
-        foods[f"{food_name} ({garnish})"]["count"] += value["count"]
-        foods[f"{food_name} ({garnish})"]["garnish"] = value["garnish"]
+        foods[food_name] += value["count"]
+        foods[food_name] = value["garnish"]
 
-    await state.update_data(garnish=garnish)
-
+    await state.update_data(order_foods=foods, garnish=garnish, food=food_name)
     f_name = message.from_user.full_name
     order_text = format_order_text(table_id, foods, full_name=f_name)
     await message.answer(order_text, reply_markup=get_count_button())
@@ -427,11 +427,11 @@ async def food_count_input(message: Message, state: FSMContext):
             }
         else:
             foods[food_name]["count"] += count
-            foods[food_name]["garnish"] = garnish
+
     except ValueError:
         await message.answer("Введите целое число.")
         return
-
+    print("foods1", foods)
     await state.update_data(order_foods=foods)
     f_name = message.from_user.full_name
     order_text = format_order_text(table_id, foods, full_name=f_name)

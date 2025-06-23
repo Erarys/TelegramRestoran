@@ -57,7 +57,7 @@ async def get_table_order_message(table_id):
         )
         order = order_result.scalar_one_or_none()
 
-        return order.message_id, order.message_id_shashlik, order if order.message_id_lagman else None
+        return order.message_id, order.message_id_shashlik, order.message_id_lagman if order.message_id_lagman else None
 
 # ✅ Получение счёта
 async def get_table_order(table_id):
