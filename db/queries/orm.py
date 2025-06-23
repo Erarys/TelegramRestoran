@@ -106,14 +106,14 @@ async def process_table_order(
                 raise ValueError(f"Table async with id {table_id} not found")
 
             foods_objects = {}
-            for food_name in foods.keys():
+            for food_name, food_info in foods.items():
                 result = await session.execute(select(MenuORM).where(MenuORM.food_name == food_name))
                 foods_objects[food_name] = result.scalar_one_or_none()
 
             if table.is_available:
                 food_entries = [
-                    FoodsORM(food=food_name, price_per_unit=menu_obj.price, count=count)
-                    for food_name, count in foods.items()
+                    FoodsORM(food=food_name, price_per_unit=menu_obj.price, count=food_info["count"])
+                    for food_name, food_info in foods.items()
                     if (menu_obj := foods_objects.get(food_name))
                 ]
                 order = OrderFoodORM(
@@ -146,18 +146,18 @@ async def process_table_order(
                 order.message_id_lagman = message_id_lagman
                 existing_foods = {food.food: food for food in order.foods}
 
-                for food_name, count in foods.items():
+                for food_name, food_info in foods.items():
+
                     if food_name in existing_foods:
-                        if count == 0:
+                        if food_info["count"] == 0:
                             order.foods.remove(existing_foods[food_name])
                         else:
-                            existing_foods[food_name].count = count
+                            existing_foods[food_name].count = food_info["count"]
                     else:
                         menu_obj = foods_objects.get(food_name)
                         if menu_obj:
-                            new_food = FoodsORM(food=food_name, price_per_unit=menu_obj.price, count=count)
+                            new_food = FoodsORM(food=food_name, price_per_unit=menu_obj.price, count=food_info["count"])
                             order.foods.append(new_food)
-                            print("foods:", order)
 
 
 async def clear_table(table_id):

@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import List
+from typing import List, Optional
 
 from sqlalchemy import String, ForeignKey
 from sqlalchemy.orm import mapped_column, Mapped, relationship
@@ -37,6 +37,7 @@ class FoodsORM(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     food: Mapped[str] = mapped_column(String(length=100))
+    garnish: Mapped[Optional[str]] = mapped_column(String(length=100), nullable=True)
     count: Mapped[int]
     price_per_unit: Mapped[int]
     order_id: Mapped[int] = mapped_column(ForeignKey("order_food.id"))

@@ -36,7 +36,7 @@ async def get_table_foods(table_id) -> dict:
         if not order:
             return {}
 
-        return {food.food: food.count for food in order.foods}
+        return {food.food: {"count": food.count, "garnish": food.garnish} for food in order.foods}
 
 # ✅ Получение message_id по последнему заказу
 async def get_table_order_message(table_id):
@@ -86,6 +86,7 @@ async def get_table_order(table_id):
             index: {
                 "name": food.food,
                 "count": food.count,
+                "garnish": food.garnish,
                 "price": food.price_per_unit,
             }
             for index, food in enumerate(order.foods, start=1)

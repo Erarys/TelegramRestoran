@@ -102,6 +102,9 @@ def get_order_status_keyboard(order_creator_id: int):
 def choose_food_type():
     kb = [
         [
+            KeyboardButton(text="save"),
+        ],
+        [
             KeyboardButton(text="Шашлык 🍢"),
             KeyboardButton(text="Лагман 🍜")
         ],
@@ -110,7 +113,8 @@ def choose_food_type():
             KeyboardButton(text="Салаты 🥗")
         ],
         [
-            KeyboardButton(text="Блюда с гарниром 🍛")
+            KeyboardButton(text="Блюда с гарниром 🍛"),
+            KeyboardButton(text="Напитки 🥤")
         ]
 
     ]
@@ -143,11 +147,12 @@ def choose_lagman_food():
         [
             KeyboardButton(text="Гуйру цомян"),
             KeyboardButton(text="Дин-дин"),
-            KeyboardButton(text="Рёбра лагман"),
+            KeyboardButton(text="Лагман с ребрами"),
         ],
         [
             KeyboardButton(text="Могру"),
             KeyboardButton(text="Хаухуа"),
+            KeyboardButton(text="Мошру"),
             KeyboardButton(text="Фирменный лагман \"Арыс\""),
         ]
 
@@ -159,12 +164,12 @@ def choose_lagman_food():
 def choose_dishes_food():
     kb = [
         [
-            KeyboardButton(text="Кызыл пельмен"),
+            KeyboardButton(text="Красные пельмени"),
             KeyboardButton(text="Мампар")
         ],
         [
-            KeyboardButton(text="Ет сорпа"),
-            KeyboardButton(text="Домашний пельмен"),
+            KeyboardButton(text="Суп с мясом"),
+            KeyboardButton(text="Пельмень"),
         ],
         [
             KeyboardButton(text="Фри с мясом"),
@@ -182,7 +187,7 @@ def choose_selad_food():
             KeyboardButton(text="Пекинский салат")
         ],
         [
-            KeyboardButton(text="Ачучук салат"),
+            KeyboardButton(text="Ачучук"),
             KeyboardButton(text="Хрустящий баклажан"),
         ]
 
@@ -194,12 +199,12 @@ def choose_selad_food():
 def choose_garnish_food():
     kb = [
         [
-            KeyboardButton(text="Мясо по тайский"),
+            KeyboardButton(text="Мясо по-тайски"),
             KeyboardButton(text="Мушуру сай"),
         ],
         [
             KeyboardButton(text="Могуру сай"),
-            KeyboardButton(text="Казан Кебаб"),
+            KeyboardButton(text="Казан-кебаб"),
         ],
         [
             KeyboardButton(text="Дапанджи"),
@@ -225,4 +230,17 @@ def choose_garnish_additional():
 
     return keyboard
 
+def choose_drinks():
+    kb = [
+        [
+            KeyboardButton(text="Coca-Cola 2л"),
+            KeyboardButton(text="Fanta 1л"),
+        ],
+        [
+            KeyboardButton(text="Coca-Cola 1л"),
+        ]
 
+    ]
+    keyboard = ReplyKeyboardMarkup(keyboard=kb)
+
+    return keyboard

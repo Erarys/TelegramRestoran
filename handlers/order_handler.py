@@ -27,7 +27,7 @@ from keyboards.order_keyboard import (
     get_order_option_button,
     TableCallback,
     get_order_status_keyboard, get_drinks_button, choose_food_type, choose_shashlik_food, choose_lagman_food,
-    choose_dishes_food, choose_selad_food, choose_garnish_food
+    choose_dishes_food, choose_selad_food, choose_garnish_food, choose_garnish_additional, choose_drinks
 )
 
 router = Router()
@@ -46,21 +46,31 @@ class OrderForm(StatesGroup):
 
 
 def format_order_text(table_id: str, foods: dict, full_name="") -> str:
-    text = "\n".join(f"• {name}: {count}шт" for name, count in foods.items())
+    text = "\n".join(
+        f"• {name} ({food_info['garnish']}): {food_info['count']}шт"
+        if food_info.get("garnish") is not None
+        else f"• {name}: {food_info['count']}шт"
+        for name, food_info in foods.items()
+    )
     return f"<b>Стол:</b> {table_id}\nОфициант: {full_name}\n\n{text}"
 
 
 def get_diff(new: dict, old: dict) -> dict:
     foods = {}
     for key in new:
-        old_count = old.get(key, 0)
-        new_count = new[key]
+        old_count = old.get(key, {}).get("count", 0)
+        new_count = new[key]["count"]
         if new_count != old_count:
-            foods[key] = new_count - old_count
+            foods[key] = {
+                "count": new_count - old_count,
+                "garnish": new[key].get("garnish", ""),
+
+            }
 
     text = "\n".join(
-        f"✅ {name}: ➕{count}шт" if count > 0 else f"🔻 {name}: ➖{abs(count)}шт"
-        for name, count in foods.items()
+        f"✅ {name} {food_info['garnish']}: ➕{food_info['count']}шт" if food_info[
+                                                                           'count'] > 0 else f"🔻 {name}: ➖{abs(food_info['count'])}шт"
+        for name, food_info in foods.items()
     )
     return text
 
@@ -94,10 +104,10 @@ async def table_action(callback: CallbackQuery, callback_data: TableCallback, st
 
     elif callback_data.action == "edit":
         foods = await get_table_foods(table_id)
-        menu = await get_menu(1500, 5000)
         await state.update_data(table_id=table_id, order_foods=foods)
         await state.set_state(OrderForm.food)
-        await callback.message.answer(text="Выберите меню:", reply_markup=get_order_button(menu))
+        await callback.message.answer(text="<b>Выберите категорию</b>", reply_markup=choose_food_type())
+        await state.set_state(OrderForm.food_type)
 
     await callback.answer()
 
@@ -128,11 +138,12 @@ async def table_input(message: Message, state: FSMContext):
             count = food.get("count", 0)
             price = food.get("price", 0)
             name = food.get("name", "—")
+            garnish = food.get("garnish", " ")
 
             summary = price * count
             bill_sum += summary
 
-            lines.append(f"{index}) {name} <i>{count}x{price}</i> = {summary}тг")
+            lines.append(f"{index}) {name} ({garnish}) <i>{count}x{price}</i> = {summary}тг")
 
         lines.append(f"\n<i>Итого</i>: {bill_sum}тг")
         text = "\n".join(lines)
@@ -153,26 +164,6 @@ async def table_input(message: Message, state: FSMContext):
 async def food_type(message: Message, state: FSMContext):
     text = message.text.strip()
 
-    if text == "Шашлык 🍢":
-        await message.answer("<b>Выберите меню:</b>", reply_markup=choose_shashlik_food())
-    elif text == "Лагман 🍜":
-        await message.answer("<b>Выберите меню:</b>", reply_markup=choose_lagman_food())
-    elif text == "Горячие Блюда 🐦‍🔥":
-        await message.answer("<b>Выберите меню:</b>", reply_markup=choose_dishes_food())
-    elif text == "Блюда с гарниром 🍛":
-        await message.answer("<b>Выберите меню:</b>", reply_markup=choose_garnish_food())
-    elif text == "Салаты 🥗":
-        await message.answer("<b>Выберите меню:</b>", reply_markup=choose_selad_food())
-
-    await state.set_state(OrderForm.food)
-
-# @router.message(F.text, OrderForm.garnish)
-# async def garnish(message: Message, state: FSMContext):
-#     await message.answer()
-
-@router.message(F.text, OrderForm.food)
-async def food_selection(message: Message, state: FSMContext):
-    text = message.text.strip()
     order = await state.get_data()
     foods = order.get("order_foods", {})
     table_id = order.get("table_id")
@@ -184,7 +175,32 @@ async def food_selection(message: Message, state: FSMContext):
 
         f_name = message.from_user.full_name
         foods_shashlik = filter_foods(foods, ["Шашлык"])
-        foods_lagman = filter_foods(foods, ["Лагман"])
+        foods_lagman = filter_foods(foods, [
+            "Гуйру",
+            "Суйру",
+            "Домашний лагман",
+            "Гуйру цомян",
+            "Дин-дин",
+            "Лагман с ребрами",
+            "Могру",
+            "Хаухуа",
+            "Мошру",
+            "Фирменный лагман \"Арыс\"",
+            "Красные пельмени",
+            "Мампар",
+            "Суп с мясом",
+            "Пельмень",
+            "Фри с мясом",
+            "Мясо по-тайски",
+            "Мушуру сай",
+            "Могуру сай",
+            "Казан-кебаб",
+            "Дапанджи",
+            "Свежий салат",
+            "Пекинский салат",
+            "Хрустящий баклажан",
+            "Ачучук"
+        ])
         msg_shashlik_id = 0
         msg_lagman_id = 0
 
@@ -217,6 +233,7 @@ async def food_selection(message: Message, state: FSMContext):
             if foods_shashlik != {}:
                 order_shashlik_text = format_order_text(table_id, foods_shashlik, full_name=f_name)
                 foods_db_shashlik = filter_foods(foods_from_db, ["Шашлык"])
+
                 text_shashlik = get_diff(foods_shashlik, foods_db_shashlik)
                 if text_shashlik:
                     msg_shashlik = await message.bot.send_message(
@@ -228,7 +245,32 @@ async def food_selection(message: Message, state: FSMContext):
 
             if foods_lagman != {}:
                 order_lagman_text = format_order_text(table_id, foods_lagman, full_name=f_name)
-                foods_db_lagman = filter_foods(foods_from_db, ["Лагман"])
+                foods_db_lagman = filter_foods(foods_from_db, [
+                    "Гуйру",
+                    "Суйру",
+                    "Домашний лагман",
+                    "Гуйру цомян",
+                    "Дин-дин",
+                    "Лагман с ребрами",
+                    "Могру",
+                    "Хаухуа",
+                    "Мошру",
+                    "Фирменный лагман \"Арыс\"",
+                    "Красные пельмени",
+                    "Мампар",
+                    "Суп с мясом",
+                    "Пельмень",
+                    "Фри с мясом",
+                    "Мясо по-тайски",
+                    "Мушуру сай",
+                    "Могуру сай",
+                    "Казан-кебаб",
+                    "Дапанджи",
+                    "Свежий салат",
+                    "Пекинский салат",
+                    "Хрустящий баклажан",
+                    "Ачучук"
+                ])
                 text_lagman = get_diff(foods_lagman, foods_db_lagman)
 
                 if text_lagman:
@@ -256,25 +298,27 @@ async def food_selection(message: Message, state: FSMContext):
                 msg_shashlik_id = msg_shashlik.message_id
             if foods_lagman != {}:
                 order_lagman_text = format_order_text(table_id, foods_lagman, full_name=f_name)
+
                 msg_lagman = await message.bot.send_message(
-                    -4907754244,
+                    -4815751000,
                     text=f"{order_lagman_text}\n\nСтатус заказа: Не готов",
                     reply_markup=get_order_status_keyboard(message.from_user.id)
                 )
                 msg_lagman_id = msg_lagman.message_id
         # await message.bot.send_message(-4951332350, text, reply_to_message_id=msg.message_id)
         # Тут обращаемся к базе и добавляем заказ или обновляем уже существующий
-        try:
-            await process_table_order(
-                table_id,
-                foods,
-                waiter_name,
-                msg.message_id,
-                msg_shashlik_id,
-                msg_lagman_id
-            )
-        except BaseException as exc:
-            await message.answer(f"Ошибка ORM❗️\n {exc}")
+        # try:
+
+        await process_table_order(
+            table_id,
+            foods,
+            waiter_name,
+            msg.message_id,
+            msg_shashlik_id,
+            msg_lagman_id
+        )
+        # except BaseException as exc:
+        # await message.answer(f"Ошибка ORM❗️\n {exc}")
 
         await state.clear()
         await state.set_state(OrderForm.table_id)
@@ -283,14 +327,73 @@ async def food_selection(message: Message, state: FSMContext):
         amount = await get_table_amount()
         await message.answer(order_text, reply_markup=get_table_button(amount))
         return
+
+    if text == "Шашлык 🍢":
+        await message.answer("<b>Выберите меню:</b>", reply_markup=choose_shashlik_food())
+    elif text == "Лагман 🍜":
+        await message.answer("<b>Выберите меню:</b>", reply_markup=choose_lagman_food())
+    elif text == "Горячие Блюда 🐦‍🔥":
+        await message.answer("<b>Выберите меню:</b>", reply_markup=choose_dishes_food())
+    elif text == "Салаты 🥗":
+        await message.answer("<b>Выберите меню:</b>", reply_markup=choose_selad_food())
+    elif text == "Напитки 🥤":
+        await message.answer("<b>Выберите меню:</b>", reply_markup=choose_drinks())
+
+    if text == "Блюда с гарниром 🍛":
+        await message.answer("<b>Выберите меню:</b>", reply_markup=choose_garnish_food())
+        await state.update_data(food_type="pair")
+    else:
+        await state.update_data(food_type="single")
+
+    await state.set_state(OrderForm.food)
+
+
+@router.message(F.text, OrderForm.food)
+async def food_selection(message: Message, state: FSMContext):
+    food_name = message.text.strip()
+    order = await state.get_data()
+    foods = order.get("order_foods", {})
+    table_id = order.get("table_id")
+
     # elif text == "Другие товары":
     #     menu = await get_menu(0, 1500)
     #     await message.answer("<b>Выберите:</b>", reply_markup=get_drinks_button(menu))
     #     return
-    if foods.get(text, None) is None:
-        foods[text] = 0
 
-    await state.update_data(order_foods=foods, food=text)
+    if foods.get(food_name, None) is None:
+        foods[food_name] = {"count": 0, "garnish": None}
+
+    await state.update_data(order_foods=foods, food=food_name)
+
+    # Если это лагман с гарниром, то еще выбераем гарнир
+    if order["food_type"] == "pair":
+        await message.answer("Введите гарнир", reply_markup=choose_garnish_additional())
+        await state.set_state(OrderForm.garnish)
+        return
+
+    f_name = message.from_user.full_name
+    order_text = format_order_text(table_id, foods, full_name=f_name)
+    await message.answer(order_text, reply_markup=get_count_button())
+    await state.set_state(OrderForm.count)
+
+
+@router.message(F.text, OrderForm.garnish)
+async def select_garnish(message: Message, state: FSMContext):
+    garnish = message.text.strip()
+    order = await state.get_data()
+    food_name = order["food"]
+    foods = order.get("order_foods", {})
+    table_id = order.get("table_id")
+    value = foods.pop(food_name, {"count": 0, "garnish": None})
+
+    if foods.get(f"{food_name} ({garnish})", None) is None:
+        foods[f"{food_name} ({garnish})"] = value
+    else:
+        foods[f"{food_name} ({garnish})"]["count"] += value["count"]
+        foods[f"{food_name} ({garnish})"]["garnish"] = value["garnish"]
+
+    await state.update_data(garnish=garnish)
+
     f_name = message.from_user.full_name
     order_text = format_order_text(table_id, foods, full_name=f_name)
     await message.answer(order_text, reply_markup=get_count_button())
@@ -302,6 +405,7 @@ async def food_count_input(message: Message, state: FSMContext):
     order = await state.get_data()
     foods = order.get("order_foods", {})
     food_name = order.get("food")
+    garnish = order.get("garnish", None)
     table_id = order.get("table_id")
 
     if not food_name or not table_id:
@@ -312,11 +416,18 @@ async def food_count_input(message: Message, state: FSMContext):
     try:
         count = int(message.text)
         if count == 0:
-            foods[food_name] = 0
+            foods[food_name] = {
+                "count": 0,
+                "garnish": garnish
+            }
         elif foods.get(food_name, None) is None:
-            foods[food_name] = count
+            foods[food_name] = {
+                "count": count,
+                "garnish": garnish
+            }
         else:
-            foods[food_name] += count
+            foods[food_name]["count"] += count
+            foods[food_name]["garnish"] = garnish
     except ValueError:
         await message.answer("Введите целое число.")
         return
