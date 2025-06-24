@@ -99,7 +99,13 @@ async def create_order_report(message: Message, command: CommandObject):
 
 
 @router.message(Command("report_food"))
-async def report_food(message: Message):
+async def report_shashlik(message: Message, command: CommandObject):
+    # args = command.args
+    # if not isinstance(args, str):
+    #     await message.answer("Вы не передали ни одного аргумента")
+
+    # if args.isdigit():
+    #     if args
     today = datetime.today().replace(hour=0, minute=0, second=0, microsecond=0)
     tomorrow = today + timedelta(days=1)
     file_path = f"reports/report_food{today:%Y%m%d}.xlsx"
@@ -213,7 +219,9 @@ async def auto_fill(message: Message):
         "Coca-Cola 2л": 1000,
         "Fanta 1л": 700,
         "Coca-Cola 1л": 700,
-        "Чай": 350
+        "Чай": 350,
+        "Фри": 1000,
+        "Спиральные чипсы": 700
     }
 
     dt2 = {

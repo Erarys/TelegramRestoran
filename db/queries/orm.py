@@ -48,7 +48,7 @@ async def create_report(today: datetime, tomorrow: datetime) -> dict:
                 "Номер стола": order.table_id,
                 "Официант": order.created_waiter,
                 "Заказ": " - ".join([food.food for food in order.foods]),
-                "Чек": sum([int(food.price_per_unit) for food in order.foods]),
+                "Чек": sum([food.price_per_unit * food.count  for food in order.foods]),
             }
 
         return orders_dt

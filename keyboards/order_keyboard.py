@@ -115,6 +115,9 @@ def choose_food_type():
         [
             KeyboardButton(text="Блюда с гарниром 🍛"),
             KeyboardButton(text="Напитки 🥤")
+        ],
+        [
+            KeyboardButton(text="Закуски 🍟")
         ]
 
     ]
@@ -239,6 +242,18 @@ def choose_drinks():
         [
             KeyboardButton(text="Coca-Cola 1л"),
             KeyboardButton(text="Чай"),
+        ]
+
+    ]
+    keyboard = ReplyKeyboardMarkup(keyboard=kb)
+
+    return keyboard
+
+def choose_snacks():
+    kb = [
+        [
+            KeyboardButton(text="Фри"),
+            KeyboardButton(text="Спиральные чипсы"),
         ]
 
     ]
