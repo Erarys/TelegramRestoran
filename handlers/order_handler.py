@@ -44,7 +44,33 @@ class OrderForm(StatesGroup):
     count: str = State()
     order_foods: dict = State()
 
-
+filter_for_lagman = [
+            "Гуйру",
+            "Суйру",
+            "Домашний лагман",
+            "Гуйру цомян",
+            "Дин-дин",
+            "Лагман с ребрами",
+            "Могру",
+            "Хаухуа",
+            "Мошру",
+            "Фирменный лагман \"Арыс\"",
+            "Красные пельмени",
+            "Мампар",
+            "Суп с мясом",
+            "Пельмень",
+            "Фри с мясом",
+            "Мясо по-тайски",
+            "Мушуру сай",
+            "Могуру сай",
+            "Казан-кебаб",
+            "Дапанджи",
+            "Свежий салат",
+            "Пекинский салат",
+            "Хрустящий баклажан",
+            "Ачучук",
+            "Фри"
+        ]
 def format_order_text(table_id: str, foods: dict, full_name="") -> str:
     text = "\n".join(
         f"• {name} ({food_info['garnish']}): {food_info['count']}шт"
@@ -174,32 +200,7 @@ async def food_type(message: Message, state: FSMContext):
 
         f_name = message.from_user.full_name
         foods_shashlik = filter_foods(foods, ["Шашлык"])
-        foods_lagman = filter_foods(foods, [
-            "Гуйру",
-            "Суйру",
-            "Домашний лагман",
-            "Гуйру цомян",
-            "Дин-дин",
-            "Лагман с ребрами",
-            "Могру",
-            "Хаухуа",
-            "Мошру",
-            "Фирменный лагман \"Арыс\"",
-            "Красные пельмени",
-            "Мампар",
-            "Суп с мясом",
-            "Пельмень",
-            "Фри с мясом",
-            "Мясо по-тайски",
-            "Мушуру сай",
-            "Могуру сай",
-            "Казан-кебаб",
-            "Дапанджи",
-            "Свежий салат",
-            "Пекинский салат",
-            "Хрустящий баклажан",
-            "Ачучук"
-        ])
+        foods_lagman = filter_foods(foods, filter_for_lagman)
         msg_shashlik_id = 0
         msg_lagman_id = 0
 
@@ -246,32 +247,7 @@ async def food_type(message: Message, state: FSMContext):
 
             if foods_lagman != {}:
                 order_lagman_text = format_order_text(table_id, foods_lagman, full_name=f_name)
-                foods_db_lagman = filter_foods(foods_from_db, [
-                    "Гуйру",
-                    "Суйру",
-                    "Домашний лагман",
-                    "Гуйру цомян",
-                    "Дин-дин",
-                    "Лагман с ребрами",
-                    "Могру",
-                    "Хаухуа",
-                    "Мошру",
-                    "Фирменный лагман \"Арыс\"",
-                    "Красные пельмени",
-                    "Мампар",
-                    "Суп с мясом",
-                    "Пельмень",
-                    "Фри с мясом",
-                    "Мясо по-тайски",
-                    "Мушуру сай",
-                    "Могуру сай",
-                    "Казан-кебаб",
-                    "Дапанджи",
-                    "Свежий салат",
-                    "Пекинский салат",
-                    "Хрустящий баклажан",
-                    "Ачучук"
-                ])
+                foods_db_lagman = filter_foods(foods_from_db, filter_for_lagman)
                 text_lagman = get_diff(foods_lagman, foods_db_lagman)
 
                 if text_lagman:
