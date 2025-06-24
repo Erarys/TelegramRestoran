@@ -284,18 +284,17 @@ async def food_type(message: Message, state: FSMContext):
                 msg_lagman_id = msg_lagman.message_id
         # await message.bot.send_message(-4951332350, text, reply_to_message_id=msg.message_id)
         # Тут обращаемся к базе и добавляем заказ или обновляем уже существующий
-        # try:
-
-        await process_table_order(
-            table_id,
-            foods,
-            waiter_name,
-            msg.message_id,
-            msg_shashlik_id,
-            msg_lagman_id
-        )
-        # except BaseException as exc:
-        # await message.answer(f"Ошибка ORM❗️\n {exc}")
+        try:
+            await process_table_order(
+                table_id,
+                foods,
+                waiter_name,
+                msg.message_id,
+                msg_shashlik_id,
+                msg_lagman_id
+            )
+        except BaseException as exc:
+            await message.answer(f"Ошибка ORM❗️\n {exc}")
 
         await state.clear()
         await state.set_state(OrderForm.table_id)

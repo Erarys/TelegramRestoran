@@ -45,6 +45,7 @@ async def create_report(today: datetime, tomorrow: datetime) -> dict:
 
         for order in orders:
             orders_dt[order.id] = {
+                "id": order.id,
                 "Номер стола": order.table_id,
                 "Официант": order.created_waiter,
                 "Заказ": " - ".join([f"{food.food} x {food.count}" for food in order.foods]),
@@ -52,6 +53,26 @@ async def create_report(today: datetime, tomorrow: datetime) -> dict:
             }
 
         return orders_dt
+
+# Пример: удалить заказы с id в [5, 10]
+async def delete_orders(order_ids: list[int]):
+    ls = []
+    async with factory_session() as session:
+        async with session.begin():
+
+            # Получаем нужные заказы
+            result = await session.execute(
+                select(OrderFoodORM)
+                .where(OrderFoodORM.id.in_(order_ids))
+                .options(selectinload(OrderFoodORM.foods))  # загружаем связанные foods
+            )
+            orders = result.scalars().all()
+
+            for order in orders:
+                ls.append(order.table_id)
+                await session.delete(order)  # автоматически удалит связанные foods
+        return ls
+        # session.commit() не нужен — уже в контексте begin
 
 
 async def create_food_report(today: datetime, tomorrow: datetime, food_names: list[str]):

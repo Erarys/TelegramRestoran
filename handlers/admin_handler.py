@@ -9,7 +9,7 @@ from aiogram.types.input_file import FSInputFile
 
 from db.queries.check_get import get_menu
 from db.queries.orm import create_report, create_report_period, fill_table, fill_food_menu, delete_menu, \
-    create_food_report, restart_table
+    create_food_report, restart_table, delete_orders
 from filters.base_filters import IsAdmin
 from keyboards.admin_keyboard import get_menu_button, FoodDeleteCallback
 
@@ -66,6 +66,15 @@ def excel_work(orders_df, excel_path):
 
     # Сохраняем обновлённый файл
     wb.save(excel_path)
+
+
+@router.message(Command("delete"))
+async def delete_order(message: Message, command: CommandObject):
+    await message.answer(f"{message.chat.id}")
+    if command.args is not None:
+        figure = command.args.split()
+        result = await delete_orders(list(map(int, figure)))
+        await message.answer(f"Мы удалили: {result}")
 
 
 @router.message(Command("report"))
