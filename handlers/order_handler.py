@@ -120,6 +120,11 @@ async def cancel_create_order(message: Message, state: FSMContext):
     await state.clear()
     await message.answer("Отменено ❎")
 
+@router.message(Command("back"))
+async def back_to_menu(message: Message, state: FSMContext):
+    await message.answer(text="<b>Выберите категорию</b>", reply_markup=choose_food_type())
+    await state.set_state(OrderForm.food_type)
+
 
 @router.callback_query(TableCallback.filter())
 async def table_action(callback: CallbackQuery, callback_data: TableCallback, state: FSMContext):
