@@ -230,6 +230,7 @@ async def food_type(message: Message, state: FSMContext):
             )
 
             try:
+                await message.answer(foods_lagman)
                 await message.bot.delete_message(-4951332350, msg_id)
                 if msg_id_shashlik != 0 and foods_shashlik != {}:
                     await message.bot.delete_message(-4921594223, msg_id_shashlik)
