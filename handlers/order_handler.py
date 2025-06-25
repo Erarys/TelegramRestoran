@@ -78,6 +78,7 @@ filter_for_lagman = [
             "Фри"
         ]
 def format_order_text(table_id: str, foods: dict, full_name="") -> str:
+
     text = "\n".join(
         f"• {name} ({food_info['garnish']}): {food_info['count']}шт"
         if food_info.get("garnish") is not None
@@ -368,8 +369,7 @@ async def select_garnish(message: Message, state: FSMContext):
     if foods.get(food_name, None) is None:
         foods[food_name] = value
     else:
-        foods[food_name] = value["count"]
-        foods[food_name] = value["garnish"]
+        foods[food_name] = {value["count"], value["garnish"]}
 
     await state.update_data(order_foods=foods, garnish=garnish, food=food_name)
     f_name = message.from_user.full_name
