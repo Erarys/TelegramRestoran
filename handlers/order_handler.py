@@ -80,9 +80,7 @@ filter_for_lagman = [
 def format_order_text(table_id: str, foods: dict, full_name="") -> str:
 
     text = "\n".join(
-        f"• {name} ({food_info['garnish']}): {food_info['count']}шт"
-        if food_info.get("garnish") is not None
-        else f"• {name}: {food_info['count']}шт"
+        f"• {name}: {food_info['count']}шт"
         for name, food_info in foods.items()
     )
     return f"<b>Стол:</b> {table_id}\nОфициант: {full_name}\n\n{text}"
