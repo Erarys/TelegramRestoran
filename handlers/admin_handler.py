@@ -26,7 +26,33 @@ class MenuForm(StatesGroup):
 
 router = Router()
 router.message.filter(IsAdmin())
-
+filter_for_lagman = [
+    "Гуйру",
+    "Суйру",
+    "Домашний лагман",
+    "Гуйру цомян",
+    "Дин-дин",
+    "Лагман с ребрами",
+    "Могру",
+    "Хаухуа",
+    "Мошру",
+    "Фирменный лагман \"Арыс\"",
+    "Красные пельмени",
+    "Мампар",
+    "Суп с мясом",
+    "Пельмень",
+    "Фри с мясом",
+    "Мясо по-тайски",
+    "Мушуру сай",
+    "Могуру сай",
+    "Казан-кебаб",
+    "Дапанджи",
+    "Свежий салат",
+    "Пекинский салат",
+    "Хрустящий баклажан",
+    "Ачучук",
+    "Фри"
+]
 
 def excel_work(orders_df, excel_path):
     # Предположим, что это DataFrame
@@ -132,6 +158,31 @@ async def report_shashlik(message: Message, command: CommandObject):
     document = FSInputFile(file_path)
     await message.bot.send_document(message.chat.id, document)
 
+
+@router.message(Command("report_food2"))
+async def report_shashlik(message: Message, command: CommandObject):
+    # args = command.args
+    # if not isinstance(args, str):
+    #     await message.answer("Вы не передали ни одного аргумента")
+
+    # if args.isdigit():
+    #     if args
+    today = datetime.today().replace(hour=0, minute=0, second=0, microsecond=0)
+    tomorrow = today + timedelta(days=1)
+    file_path = f"reports/report_food{today:%Y%m%d}.xlsx"
+
+    orders_dt: dict = await create_food_report(today, tomorrow, filter_for_lagman)
+
+    orders_dt["Итого"] = {
+        "Сумма": sum([value["Сумма"] for value in orders_dt.values()]),
+        "Доля шашлычника": sum([value["Доля шашлычника"] for value in orders_dt.values()]),
+    }
+
+    orders_df = pd.DataFrame.from_dict(orders_dt, orient='index')  # ключи 10, 11 станут индексами
+    excel_work(orders_df, file_path)
+
+    document = FSInputFile(file_path)
+    await message.bot.send_document(message.chat.id, document)
 
 @router.message(Command("add_table"))
 async def restart_order(message: Message, command: CommandObject):

@@ -231,15 +231,17 @@ async def food_type(message: Message, state: FSMContext):
                 reply_markup=get_order_status_keyboard(message.from_user.id)
             )
 
-            try:
-                await message.bot.delete_message(-4773383218, msg_id)
-                if foods_lagman != {}:
-                    await message.bot.delete_message(-4921594223, msg_id_shashlik)
-                if foods_lagman != {}:
-                    await message.bot.delete_message(-4815751000, msg_id_lagman)
+            # try:
+            await message.bot.delete_message(-4773383218, msg_id)
+            print("AI LAGMAN", foods_lagman)
+            if foods_shashlik != {}:
+                await message.bot.delete_message(-4921594223, msg_id_shashlik)
+            if foods_lagman != {}:
+                print("its work")
+                await message.bot.delete_message(-4973191656, msg_id_lagman)
 
-            except:
-                await message.answer("Сообщение для удаления не найдно")
+            # except:
+            #     await message.answer("Сообщение для удаления не найдно")
 
             if foods_shashlik != {}:
                 order_shashlik_text = format_order_text(table_id, foods_shashlik, full_name=f_name)
@@ -261,7 +263,7 @@ async def food_type(message: Message, state: FSMContext):
 
                 if text_lagman:
                     msg_lagman = await message.bot.send_message(
-                        -4815751000,
+                        -4973191656,
                         text=f"{order_lagman_text}\n\nПохоже официант изменил меню👀 \n{text_lagman}\n\nСтатус заказа: Не готов",
                         reply_markup=get_order_status_keyboard(message.from_user.id)
                     )
@@ -286,7 +288,7 @@ async def food_type(message: Message, state: FSMContext):
                 order_lagman_text = format_order_text(table_id, foods_lagman, full_name=f_name)
 
                 msg_lagman = await message.bot.send_message(
-                    -4815751000,
+                    -4973191656,
                     text=f"{order_lagman_text}\n\nСтатус заказа: Не готов",
                     reply_markup=get_order_status_keyboard(message.from_user.id)
                 )
