@@ -25,28 +25,6 @@ def get_table_button(amount: int):
     return builder.as_markup()
 
 
-def get_order_button(menu):
-    builder = ReplyKeyboardBuilder()
-    builder.add(KeyboardButton(text="save"))
-    builder.add(KeyboardButton(text="Другие товары"))
-
-    for food in menu.values():
-        builder.add(KeyboardButton(text=str(food["name"])))
-
-
-    builder.adjust(3)
-    return builder.as_markup()
-
-
-def get_drinks_button(menu):
-    builder = ReplyKeyboardBuilder()
-
-    for food in menu.values():
-        builder.add(KeyboardButton(text=str(food["name"])))
-
-    builder.adjust(3)
-    return builder.as_markup()
-
 def get_count_button():
     builder = ReplyKeyboardBuilder()
 
@@ -242,6 +220,9 @@ def choose_drinks():
         [
             KeyboardButton(text="Coca-Cola 1л"),
             KeyboardButton(text="Чай"),
+        ],
+        [
+            KeyboardButton(text="Beerkhan Пиво"),
         ]
 
     ]
@@ -254,9 +235,23 @@ def choose_snacks():
         [
             KeyboardButton(text="Фри"),
             KeyboardButton(text="Спиральные чипсы"),
+        ],
+        [
+            KeyboardButton(text="Лепешка"),
         ]
 
     ]
     keyboard = ReplyKeyboardMarkup(keyboard=kb)
 
     return keyboard
+
+
+# def choose_alcohol():
+#     kb = [
+#         [
+#             KeyboardButton(text="Beerkhan Пиво"),
+#         ]
+#     ]
+#
+#     keyboard = ReplyKeyboardMarkup(keyboard=kb)
+#     return keyboard

@@ -11,7 +11,6 @@ from db.queries.check_get import (
     get_table_foods,
     check_free_table,
     get_table_order,
-    get_menu,
     get_table_amount, get_table_order_message
 )
 
@@ -22,12 +21,19 @@ from db.queries.orm import (
 from filters.base_filters import ChatTypeFilter, IsWaiter
 from keyboards.order_keyboard import (
     get_table_button,
-    get_order_button,
     get_count_button,
     get_order_option_button,
     TableCallback,
-    get_order_status_keyboard, get_drinks_button, choose_food_type, choose_shashlik_food, choose_lagman_food,
-    choose_dishes_food, choose_selad_food, choose_garnish_food, choose_garnish_additional, choose_drinks, choose_snacks
+    get_order_status_keyboard,
+    choose_food_type,
+    choose_shashlik_food,
+    choose_lagman_food,
+    choose_dishes_food,
+    choose_selad_food,
+    choose_garnish_food,
+    choose_garnish_additional,
+    choose_drinks,
+    choose_snacks
 )
 
 router = Router()
@@ -179,8 +185,6 @@ async def table_input(message: Message, state: FSMContext):
         )
     else:
         await state.update_data(table_id=message.text)
-        # menu = await get_menu(1500, 5000)
-        # await message.answer(text="<b>Выберите меню:</b>", reply_markup=get_order_button(menu))
         await message.answer(text="<b>Выберите категорию</b>", reply_markup=choose_food_type())
         await state.set_state(OrderForm.food_type)
 
@@ -332,11 +336,6 @@ async def food_selection(message: Message, state: FSMContext):
     foods = order.get("order_foods", {})
     table_id = order.get("table_id")
 
-    # elif text == "Другие товары":
-    #     menu = await get_menu(0, 1500)
-    #     await message.answer("<b>Выберите:</b>", reply_markup=get_drinks_button(menu))
-    #     return
-
     if foods.get(food_name, None) is None:
         foods[food_name] = {"count": 0, "garnish": None}
 
@@ -411,7 +410,5 @@ async def food_count_input(message: Message, state: FSMContext):
     await state.update_data(order_foods=foods)
     f_name = message.from_user.full_name
     order_text = format_order_text(table_id, foods, full_name=f_name)
-    # menu = await get_menu(1500, 5000)
-    # await message.answer(text=order_text, reply_markup=get_order_button(menu))
     await message.answer(text=order_text, reply_markup=choose_food_type())
     await state.set_state(OrderForm.food_type)
