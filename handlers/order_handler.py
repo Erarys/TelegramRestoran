@@ -217,9 +217,7 @@ async def food_type(message: Message, state: FSMContext):
         if not await check_free_table(table_id):
             msg_id, msg_id_shashlik, msg_id_lagman = await get_table_order_message(table_id)
             foods_from_db = await get_table_foods(table_id)
-            print("Is it work")
             try:
-                print(msg_id_lagman)
                 await message.bot.delete_message(-4951332350, msg_id)
                 if msg_id_shashlik != 0:
                     await message.bot.delete_message(-4921594223, msg_id_shashlik)
@@ -227,7 +225,7 @@ async def food_type(message: Message, state: FSMContext):
                     await message.bot.delete_message(-4815751000, msg_id_lagman)
 
             except:
-                print("Message not found")
+                await message.answer("Сообщение для удаления не найдно")
 
             text = get_diff(foods, foods_from_db)
             msg = await message.bot.send_message(
@@ -365,7 +363,7 @@ async def select_garnish(message: Message, state: FSMContext):
     if foods.get(food_name, None) is None:
         foods[food_name] = value
     else:
-        foods[food_name] += value["count"]
+        foods[food_name] = value["count"]
         foods[food_name] = value["garnish"]
 
     await state.update_data(order_foods=foods, garnish=garnish, food=food_name)
@@ -401,12 +399,12 @@ async def food_count_input(message: Message, state: FSMContext):
                 "garnish": garnish
             }
         else:
-            foods[food_name]["count"] += count
+            foods[food_name]["count"] = count
 
     except ValueError:
         await message.answer("Введите целое число.")
         return
-    print("foods1", foods)
+
     await state.update_data(order_foods=foods)
     f_name = message.from_user.full_name
     order_text = format_order_text(table_id, foods, full_name=f_name)
