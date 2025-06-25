@@ -366,10 +366,8 @@ async def select_garnish(message: Message, state: FSMContext):
     table_id = order.get("table_id")
     value = foods.pop(food_name, {"count": 0, "garnish": None})
     food_name = f"{food_name} ({garnish})"
-    if foods.get(food_name, None) is None:
-        foods[food_name] = value
-    else:
-        foods[food_name] = {value["count"], value["garnish"]}
+    foods[food_name] = value
+
 
     await state.update_data(order_foods=foods, garnish=garnish, food=food_name)
     f_name = message.from_user.full_name
