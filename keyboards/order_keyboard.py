@@ -222,7 +222,7 @@ def choose_drinks():
             KeyboardButton(text="Чай"),
         ],
         [
-            KeyboardButton(text="Beerkhan Пиво"),
+            KeyboardButton(text="Прага"),
         ]
 
     ]
