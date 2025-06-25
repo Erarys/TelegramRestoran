@@ -163,8 +163,10 @@ async def process_table_order(
                     raise ValueError(f"No active order found for table {table_id}")
 
                 order.message_id = message_id
-                order.message_id_shashlik = message_id_shashlik
-                order.message_id_lagman = message_id_lagman
+                if message_id_shashlik != 0:
+                    order.message_id_shashlik = message_id_shashlik
+                if message_id_lagman != 0:
+                    order.message_id_lagman = message_id_lagman
                 existing_foods = {food.food: food for food in order.foods}
 
                 for food_name, food_info in foods.items():
