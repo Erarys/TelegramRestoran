@@ -221,15 +221,6 @@ async def food_type(message: Message, state: FSMContext):
         if not await check_free_table(table_id):
             msg_id, msg_id_shashlik, msg_id_lagman = await get_table_order_message(table_id)
             foods_from_db = await get_table_foods(table_id)
-            try:
-                await message.bot.delete_message(-4951332350, msg_id)
-                if msg_id_shashlik != 0:
-                    await message.bot.delete_message(-4921594223, msg_id_shashlik)
-                if msg_id_lagman != 0:
-                    await message.bot.delete_message(-4815751000, msg_id_lagman)
-
-            except:
-                await message.answer("Сообщение для удаления не найдно")
 
             text = get_diff(foods, foods_from_db)
             msg = await message.bot.send_message(
@@ -237,6 +228,16 @@ async def food_type(message: Message, state: FSMContext):
                 text=f"{order_text}\n\nПохоже официант изменил меню👀 \n{text}\n\nСтатус заказа: Не готов",
                 reply_markup=get_order_status_keyboard(message.from_user.id)
             )
+
+            try:
+                await message.bot.delete_message(-4951332350, msg_id)
+                if msg_id_shashlik != 0 and foods_shashlik != {}:
+                    await message.bot.delete_message(-4921594223, msg_id_shashlik)
+                if msg_id_lagman != 0 and foods_lagman != {}:
+                    await message.bot.delete_message(-4815751000, msg_id_lagman)
+
+            except:
+                await message.answer("Сообщение для удаления не найдно")
 
             if foods_shashlik != {}:
                 order_shashlik_text = format_order_text(table_id, foods_shashlik, full_name=f_name)
