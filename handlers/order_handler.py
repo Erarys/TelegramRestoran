@@ -224,14 +224,14 @@ async def food_type(message: Message, state: FSMContext):
 
             text = get_diff(foods, foods_from_db)
             msg = await message.bot.send_message(
-                -4951332350,
+                -4773383218,
                 text=f"{order_text}\n\nПохоже официант изменил меню👀 \n{text}\n\nСтатус заказа: Не готов",
                 reply_markup=get_order_status_keyboard(message.from_user.id)
             )
 
             try:
                 await message.answer(foods_lagman)
-                await message.bot.delete_message(-4951332350, msg_id)
+                await message.bot.delete_message(-4773383218, msg_id)
                 if msg_id_shashlik != 0 and foods_shashlik != {}:
                     await message.bot.delete_message(-4921594223, msg_id_shashlik)
                 if msg_id_lagman != 0 and foods_lagman != {}:
@@ -268,7 +268,7 @@ async def food_type(message: Message, state: FSMContext):
 
         else:
             msg = await message.bot.send_message(
-                -4951332350,
+                -4773383218,
                 text=f"{order_text}\n\nСтатус заказа: Не готов",
                 reply_markup=get_order_status_keyboard(message.from_user.id)
             )
@@ -290,7 +290,7 @@ async def food_type(message: Message, state: FSMContext):
                     reply_markup=get_order_status_keyboard(message.from_user.id)
                 )
                 msg_lagman_id = msg_lagman.message_id
-        # await message.bot.send_message(-4951332350, text, reply_to_message_id=msg.message_id)
+
         # Тут обращаемся к базе и добавляем заказ или обновляем уже существующий
         try:
             await process_table_order(
