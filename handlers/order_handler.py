@@ -50,35 +50,37 @@ class OrderForm(StatesGroup):
     count: str = State()
     order_foods: dict = State()
 
-filter_for_lagman = [
-            "Гуйру",
-            "Суйру",
-            "Домашний лагман",
-            "Гуйру цомян",
-            "Дин-дин",
-            "Лагман с ребрами",
-            "Могру",
-            "Хаухуа",
-            "Мошру",
-            "Фирменный лагман \"Арыс\"",
-            "Красные пельмени",
-            "Мампар",
-            "Суп с мясом",
-            "Пельмень",
-            "Фри с мясом",
-            "Мясо по-тайски",
-            "Мушуру сай",
-            "Могуру сай",
-            "Казан-кебаб",
-            "Дапанджи",
-            "Свежий салат",
-            "Пекинский салат",
-            "Хрустящий баклажан",
-            "Ачучук",
-            "Фри"
-        ]
-def format_order_text(table_id: str, foods: dict, full_name="") -> str:
 
+filter_for_lagman = [
+    "Гуйру",
+    "Суйру",
+    "Домашний лагман",
+    "Гуйру цомян",
+    "Дин-дин",
+    "Лагман с ребрами",
+    "Могру",
+    "Хаухуа",
+    "Мошру",
+    "Фирменный лагман \"Арыс\"",
+    "Красные пельмени",
+    "Мампар",
+    "Суп с мясом",
+    "Пельмень",
+    "Фри с мясом",
+    "Мясо по-тайски",
+    "Мушуру сай",
+    "Могуру сай",
+    "Казан-кебаб",
+    "Дапанджи",
+    "Свежий салат",
+    "Пекинский салат",
+    "Хрустящий баклажан",
+    "Ачучук",
+    "Фри"
+]
+
+
+def format_order_text(table_id: str, foods: dict, full_name="") -> str:
     text = "\n".join(
         f"• {name}: {food_info['count']}шт"
         for name, food_info in foods.items()
@@ -118,6 +120,7 @@ def filter_foods(foods: dict, filter_words: list) -> dict:
 async def cancel_create_order(message: Message, state: FSMContext):
     await state.clear()
     await message.answer("Отменено ❎")
+
 
 @router.message(Command("back"))
 async def back_to_menu(message: Message, state: FSMContext):
@@ -174,7 +177,6 @@ async def table_input(message: Message, state: FSMContext):
             price = food.get("price", 0)
             name = food.get("name", "—")
 
-
             summary = price * count
             bill_sum += summary
 
@@ -200,15 +202,15 @@ async def food_type(message: Message, state: FSMContext):
     order = await state.get_data()
     foods = order.get("order_foods", {})
     table_id = order.get("table_id")
+    f_name = message.from_user.full_name
+    foods_shashlik = filter_foods(foods, ["Шашлык"])
+    foods_lagman = filter_foods(foods, filter_for_lagman)
 
     if text == "save":
         if foods == {}:
             await message.answer("<b>Вы ничего не выбрали❗❗️❗️️</b>")
             return
 
-        f_name = message.from_user.full_name
-        foods_shashlik = filter_foods(foods, ["Шашлык"])
-        foods_lagman = filter_foods(foods, filter_for_lagman)
         msg_shashlik_id = 0
         msg_lagman_id = 0
 
@@ -230,11 +232,10 @@ async def food_type(message: Message, state: FSMContext):
             )
 
             try:
-                await message.answer(foods_lagman)
                 await message.bot.delete_message(-4773383218, msg_id)
-                if msg_id_shashlik != 0 and foods_shashlik != {}:
+                if msg_id_shashlik != 0:
                     await message.bot.delete_message(-4921594223, msg_id_shashlik)
-                if msg_id_lagman != 0 and foods_lagman != {}:
+                if msg_id_lagman != 0:
                     await message.bot.delete_message(-4815751000, msg_id_lagman)
 
             except:
@@ -367,7 +368,6 @@ async def select_garnish(message: Message, state: FSMContext):
     value = foods.pop(food_name, {"count": 0, "garnish": None})
     food_name = f"{food_name} ({garnish})"
     foods[food_name] = value
-
 
     await state.update_data(order_foods=foods, garnish=garnish, food=food_name)
     f_name = message.from_user.full_name
