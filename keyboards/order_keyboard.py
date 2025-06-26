@@ -3,7 +3,6 @@ from aiogram.types import KeyboardButton, InlineKeyboardButton, InlineKeyboardMa
 from aiogram.utils.keyboard import ReplyKeyboardBuilder, InlineKeyboardBuilder
 
 
-
 class TableCallback(CallbackData, prefix="table"):
     action: str
     table_id: str
@@ -92,7 +91,9 @@ def choose_food_type():
         ],
         [
             KeyboardButton(text="Блюда с гарниром 🍛"),
-            KeyboardButton(text="Напитки 🥤")
+            KeyboardButton(text="Напитки 🥤"),
+            KeyboardButton(text="Пиво 🍺"),
+
         ],
         [
             KeyboardButton(text="Закуски 🍟")
@@ -102,6 +103,7 @@ def choose_food_type():
     keyboard = ReplyKeyboardMarkup(keyboard=kb)
 
     return keyboard
+
 
 def choose_shashlik_food():
     kb = [
@@ -117,6 +119,7 @@ def choose_shashlik_food():
     keyboard = ReplyKeyboardMarkup(keyboard=kb)
 
     return keyboard
+
 
 def choose_lagman_food():
     kb = [
@@ -142,6 +145,7 @@ def choose_lagman_food():
 
     return keyboard
 
+
 def choose_dishes_food():
     kb = [
         [
@@ -161,6 +165,7 @@ def choose_dishes_food():
 
     return keyboard
 
+
 def choose_selad_food():
     kb = [
         [
@@ -176,6 +181,7 @@ def choose_selad_food():
     keyboard = ReplyKeyboardMarkup(keyboard=kb)
 
     return keyboard
+
 
 def choose_garnish_food():
     kb = [
@@ -196,6 +202,7 @@ def choose_garnish_food():
 
     return keyboard
 
+
 def choose_garnish_additional():
     kb = [
         [
@@ -211,6 +218,7 @@ def choose_garnish_additional():
 
     return keyboard
 
+
 def choose_drinks():
     kb = [
         [
@@ -222,13 +230,14 @@ def choose_drinks():
             KeyboardButton(text="Чай"),
         ],
         [
-            KeyboardButton(text="Прага"),
+            KeyboardButton(text="Детский сок"),
         ]
 
     ]
     keyboard = ReplyKeyboardMarkup(keyboard=kb)
 
     return keyboard
+
 
 def choose_snacks():
     kb = [
@@ -246,12 +255,17 @@ def choose_snacks():
     return keyboard
 
 
-# def choose_alcohol():
-#     kb = [
-#         [
-#             KeyboardButton(text="Beerkhan Пиво"),
-#         ]
-#     ]
-#
-#     keyboard = ReplyKeyboardMarkup(keyboard=kb)
-#     return keyboard
+def choose_bear():
+    kb = [
+        [
+            KeyboardButton(text="Прага"),
+            KeyboardButton(text="Гусь Экспортное"),
+        ],
+        [
+            KeyboardButton(text="Гусь"),
+            KeyboardButton(text="Carlsberg"),
+        ]
+    ]
+
+    keyboard = ReplyKeyboardMarkup(keyboard=kb)
+    return keyboard

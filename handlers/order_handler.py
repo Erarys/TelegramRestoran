@@ -33,7 +33,7 @@ from keyboards.order_keyboard import (
     choose_garnish_food,
     choose_garnish_additional,
     choose_drinks,
-    choose_snacks
+    choose_snacks, choose_bear
 )
 
 router = Router()
@@ -329,6 +329,8 @@ async def food_type(message: Message, state: FSMContext):
         await message.answer("<b>Выберите меню:</b>", reply_markup=choose_drinks())
     elif text == "Закуски 🍟":
         await message.answer("<b>Выберите меню:</b>", reply_markup=choose_snacks())
+    elif text == "Пиво 🍺":
+        await message.answer("<b>Выберите меню:</b>", reply_markup=choose_bear())
     if text == "Блюда с гарниром 🍛":
         await message.answer("<b>Выберите меню:</b>", reply_markup=choose_garnish_food())
         await state.update_data(food_type="pair")
