@@ -261,11 +261,11 @@ async def food_type(message: Message, state: FSMContext):
 
                 if text_lagman:
                     try:
-                        await message.bot.delete_message(-4944653262, msg_id_lagman)
+                        await message.bot.delete_message(-4815751000, msg_id_lagman)
                     except:
                         pass
                     msg_lagman = await message.bot.send_message(
-                        -4944653262,
+                        -4815751000,
                         text=f"{order_lagman_text}\n\nПохоже официант изменил меню👀 \n{text_lagman}\n\nСтатус заказа: Не готов",
                         reply_markup=get_order_status_keyboard(message.from_user.id)
                     )
@@ -290,7 +290,7 @@ async def food_type(message: Message, state: FSMContext):
                 order_lagman_text = format_order_text(table_id, foods_lagman, full_name=f_name)
 
                 msg_lagman = await message.bot.send_message(
-                    -4944653262,
+                    -4815751000,
                     text=f"{order_lagman_text}\n\nСтатус заказа: Не готов",
                     reply_markup=get_order_status_keyboard(message.from_user.id)
                 )
