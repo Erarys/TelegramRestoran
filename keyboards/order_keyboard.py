@@ -112,7 +112,8 @@ def choose_shashlik_food():
             KeyboardButton(text="Утка")
         ],
         [
-            KeyboardButton(text="Окорочка")
+            KeyboardButton(text="Крылочка"),
+            KeyboardButton(text="Люля")
         ]
 
     ]

@@ -145,7 +145,7 @@ async def report_shashlik(message: Message, command: CommandObject):
     tomorrow = today + timedelta(days=1)
     file_path = f"reports/report_food{today:%Y%m%d}.xlsx"
 
-    orders_dt: dict = await create_food_report(today, tomorrow, ["Шашлык Утка", "Шашлык Баранина"])
+    orders_dt: dict = await create_food_report(today, tomorrow, ["Баранина", "Утка", "Крылочка", "Люля"])
 
     orders_dt["Итого"] = {
         "Сумма": sum([value["Сумма"] for value in orders_dt.values()]),
@@ -288,6 +288,10 @@ async def auto_fill(message: Message):
         "Гусь Экспортное": 700,
         "Гусь": 700,
         "Carlsberg": 700,
+        "Баранина":2000,
+        "Утка": 1600,
+        "Крылочка": 1500,
+        "Люля": 1800,
 
     }
 
