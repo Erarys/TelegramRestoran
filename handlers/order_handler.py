@@ -203,7 +203,8 @@ async def food_type(message: Message, state: FSMContext):
     foods = order.get("order_foods", {})
     table_id = order.get("table_id")
     f_name = message.from_user.full_name
-    foods_shashlik = filter_foods(foods, ["Шашлык"])
+    foods_shashlik = filter_foods(foods, ["Баранина", "Утка", "Крылочка", "Люля"])
+
     foods_lagman = filter_foods(foods, filter_for_lagman)
 
     if text == "save":
