@@ -109,11 +109,14 @@ def choose_shashlik_food():
     kb = [
         [
             KeyboardButton(text="Баранина"),
-            KeyboardButton(text="Утка")
+            KeyboardButton(text="Утка"),
+            KeyboardButton(text="Крылочка"),
         ],
         [
-            KeyboardButton(text="Крылочка"),
-            KeyboardButton(text="Люля")
+
+            KeyboardButton(text="Люля"),
+            KeyboardButton(text="Ребра"),
+            KeyboardButton(text="Антерекот")
         ]
 
     ]
@@ -248,6 +251,7 @@ def choose_snacks():
         ],
         [
             KeyboardButton(text="Лепешка"),
+            KeyboardButton(text="Курт"),
         ]
 
     ]
