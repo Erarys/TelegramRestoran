@@ -104,7 +104,7 @@ def format_order_text_with_price(table_id: str, foods: dict, full_name="") -> st
     for name, food_info in foods.items():
         count = food_info.get("count", 0)
 
-        price = food_info.get("price_per_unit", 0)
+        price = food_info.get("price", 0)
         summary = count * price
         bill_sum += summary
 
@@ -242,6 +242,7 @@ async def food_type(message: Message, state: FSMContext):
         msg_shashlik_id = 0
         msg_lagman_id = 0
         foods_with_price = await fill_foods_with_prices(foods)
+        print(foods_with_price)
         order_text = format_order_text_with_price(table_id, foods_with_price, full_name=f_name)
 
         # Выбираем имя или фамилию работника (выбираем не None)
