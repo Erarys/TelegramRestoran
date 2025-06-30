@@ -111,6 +111,24 @@ async def create_food_report(today: datetime, tomorrow: datetime, food_names: li
         return orders_dt
 
 
+
+async def fill_foods_with_prices(foods: dict) -> dict:
+    """
+    Получает цены из MenuORM и добавляет их в словарь foods.
+    """
+    async with factory_session() as session:
+        for name, food_data in foods.items():
+            result = await session.execute(
+                select(MenuORM.price).where(MenuORM.food_name == name)
+            )
+            price = result.scalar_one_or_none()
+            if price is not None:
+                food_data["price"] = price
+            else:
+                food_data["price"] = 0  # если цена не найдена — поставить 0 или можно выкинуть ошибку
+
+        return foods
+
 async def process_table_order(
         table_id: int,
         foods: dict,

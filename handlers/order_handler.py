@@ -16,7 +16,7 @@ from db.queries.check_get import (
 
 from db.queries.orm import (
     process_table_order,
-    clear_table
+    clear_table, fill_foods_with_prices
 )
 from filters.base_filters import ChatTypeFilter, IsWaiter
 from keyboards.order_keyboard import (
@@ -97,12 +97,14 @@ def format_order_text(table_id: str, foods: dict, full_name="") -> str:
     return f"<b>Стол:</b> {table_id}\nОфициант: {full_name}\n\n{text}"
 
 def format_order_text_with_price(table_id: str, foods: dict, full_name="") -> str:
+
     lines = [f"<b>Стол:</b> {table_id}", f"<b>Официант:</b> {full_name}", ""]
 
     bill_sum = 0
     for name, food_info in foods.items():
         count = food_info.get("count", 0)
-        price = food_info.get("price", 0)
+
+        price = food_info.get("price_per_unit", 0)
         summary = count * price
         bill_sum += summary
 
@@ -239,8 +241,8 @@ async def food_type(message: Message, state: FSMContext):
 
         msg_shashlik_id = 0
         msg_lagman_id = 0
-
-        order_text = format_order_text_with_price(table_id, foods, full_name=f_name)
+        foods_with_price = fill_foods_with_prices(foods)
+        order_text = format_order_text_with_price(table_id, foods_with_price, full_name=f_name)
 
         # Выбираем имя или фамилию работника (выбираем не None)
         waiter_name = message.from_user.first_name or message.from_user.last_name
