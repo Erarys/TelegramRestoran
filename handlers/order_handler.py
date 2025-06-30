@@ -78,6 +78,15 @@ filter_for_lagman = [
     "Ачучук",
     "Фри"
 ]
+filter_for_shashlik = [
+    "Баранина",
+    "Утка",
+    "Крылочка",
+    "Люля",
+    "Ребра",
+    "Антрекот",
+    "Говядина",
+]
 
 
 def format_order_text(table_id: str, foods: dict, full_name="") -> str:
@@ -86,6 +95,9 @@ def format_order_text(table_id: str, foods: dict, full_name="") -> str:
         for name, food_info in foods.items()
     )
     return f"<b>Стол:</b> {table_id}\nОфициант: {full_name}\n\n{text}"
+
+def format_order_text_with_price(table_id: str, foods: dict, full_name="") -> str:
+    pass
 
 
 def get_diff(new: dict, old: dict) -> dict:
@@ -203,7 +215,7 @@ async def food_type(message: Message, state: FSMContext):
     foods = order.get("order_foods", {})
     table_id = order.get("table_id")
     f_name = message.from_user.full_name
-    foods_shashlik = filter_foods(foods, ["Баранина", "Утка", "Крылочка", "Люля"])
+    foods_shashlik = filter_foods(foods, filter_for_shashlik)
 
     foods_lagman = filter_foods(foods, filter_for_lagman)
 
@@ -240,7 +252,7 @@ async def food_type(message: Message, state: FSMContext):
 
             if foods_shashlik != {}:
                 order_shashlik_text = format_order_text(table_id, foods_shashlik, full_name=f_name)
-                foods_db_shashlik = filter_foods(foods_from_db, ["Шашлык"])
+                foods_db_shashlik = filter_foods(foods_from_db, filter_for_shashlik)
 
                 text_shashlik = get_diff(foods_shashlik, foods_db_shashlik)
                 if text_shashlik:
