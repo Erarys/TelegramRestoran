@@ -87,17 +87,16 @@ def choose_food_type():
         ],
         [
             KeyboardButton(text="Горячие Блюда 🐦‍🔥"),
-            KeyboardButton(text="Салаты 🥗")
+            KeyboardButton(text="Салаты 🥗"),
+            KeyboardButton(text="Блюда с гарниром 🍛"),
         ],
         [
-            KeyboardButton(text="Блюда с гарниром 🍛"),
+
             KeyboardButton(text="Напитки 🥤"),
             KeyboardButton(text="Пиво 🍺"),
+            KeyboardButton(text="Закуски 🍟")
 
         ],
-        [
-            KeyboardButton(text="Закуски 🍟")
-        ]
 
     ]
     keyboard = ReplyKeyboardMarkup(keyboard=kb)
@@ -116,7 +115,7 @@ def choose_shashlik_food():
 
             KeyboardButton(text="Люля"),
             KeyboardButton(text="Ребра"),
-            KeyboardButton(text="Антерекот")
+            KeyboardButton(text="Антрекот")
         ]
 
     ]
@@ -235,6 +234,7 @@ def choose_drinks():
         ],
         [
             KeyboardButton(text="Детский сок"),
+            KeyboardButton(text="Turan Вода"),
         ]
 
     ]
