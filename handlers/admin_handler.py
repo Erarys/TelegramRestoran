@@ -53,6 +53,17 @@ filter_for_lagman = [
     "Ачучук",
     "Фри"
 ]
+filter_for_shashlik = [
+    "Баранина",
+    "Утка",
+    "Крылочка",
+    "Люля",
+    "Ребра",
+    "Антрекот",
+    "Говядина",
+    "Овощной",
+    "Шампинион",
+]
 
 def excel_work(orders_df, excel_path):
     # Предположим, что это DataFrame
@@ -146,7 +157,7 @@ async def report_shashlik(message: Message, command: CommandObject):
             start_day_time = datetime.strptime(start_day, "%d.%m.%Y")
             end_day_time = datetime.strptime(end_day, "%d.%m.%Y")
 
-            orders_dt = await create_food_report(start_day_time, end_day_time, ["Баранина", "Утка", "Крылочка", "Люля", "Ребра", "Антрекот", "Говядина", "Овощной", "Шампинион"])
+            orders_dt = await create_food_report(start_day_time, end_day_time, filter_for_shashlik)
         except:
             await message.answer("Ошибка")
             return
@@ -156,7 +167,7 @@ async def report_shashlik(message: Message, command: CommandObject):
 
         file_path = f"reports/report_food{today:%Y%m%d}.xlsx"
 
-        orders_dt: dict = await create_food_report(today, tomorrow, ["Баранина", "Утка", "Крылочка", "Люля", "Ребра", "Антрекот", "Говядина", "Овощной", "Шампинион"])
+        orders_dt: dict = await create_food_report(today, tomorrow, filter_for_shashlik)
 
     orders_dt["Итого"] = {
         "Сумма": sum([value["Сумма"] for value in orders_dt.values()]),
