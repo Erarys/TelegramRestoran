@@ -146,7 +146,7 @@ async def report_shashlik(message: Message, command: CommandObject):
             start_day_time = datetime.strptime(start_day, "%d.%m.%Y")
             end_day_time = datetime.strptime(end_day, "%d.%m.%Y")
 
-            orders_dt = await create_food_report(start_day_time, end_day_time, ["Баранина", "Утка", "Крылочка", "Люля", "Ребра", "Антрекот", "Говядина"])
+            orders_dt = await create_food_report(start_day_time, end_day_time, ["Баранина", "Утка", "Крылочка", "Люля", "Ребра", "Антрекот", "Говядина", "Овощной", "Шампинион"])
         except:
             await message.answer("Ошибка")
             return
@@ -156,7 +156,7 @@ async def report_shashlik(message: Message, command: CommandObject):
 
         file_path = f"reports/report_food{today:%Y%m%d}.xlsx"
 
-        orders_dt: dict = await create_food_report(today, tomorrow, ["Баранина", "Утка", "Крылочка", "Люля", "Ребра", "Антрекот", "Говядина"])
+        orders_dt: dict = await create_food_report(today, tomorrow, ["Баранина", "Утка", "Крылочка", "Люля", "Ребра", "Антрекот", "Говядина", "Овощной", "Шампинион"])
 
     orders_dt["Итого"] = {
         "Сумма": sum([value["Сумма"] for value in orders_dt.values()]),
@@ -314,8 +314,10 @@ async def auto_fill(message: Message):
         "Крылочка": 1500,
         "Люля": 1800,
         "Ребра": 1800,
-        "Антрекот": 2200,
-        "Говядина": 1800,
+        "Антрекот": 2400,
+        "Говядина": 2000,
+        "Овощной": 1000,
+        "Шампинион":1300,
         "Курт": 200,
         "Turan Вода": 450
 
