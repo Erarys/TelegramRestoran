@@ -123,6 +123,7 @@ def choose_shashlik_food():
         [
 
             KeyboardButton(text="Шампинион"),
+            KeyboardButton(text="Окорачка"),
         ]
 
     ]

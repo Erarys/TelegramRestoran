@@ -63,6 +63,7 @@ filter_for_shashlik = [
     "Говядина",
     "Овощной",
     "Шампинион",
+    "Окорачка",
 ]
 
 def excel_work(orders_df, excel_path):
@@ -339,6 +340,7 @@ async def auto_fill(message: Message):
         "Кириешки лайт": 150,
         "Арахис": 500,
         "Арахис лайт": 400,
+        "Окорачка": 1800,
 
 
     }
