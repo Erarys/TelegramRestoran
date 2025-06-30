@@ -135,17 +135,28 @@ async def create_order_report(message: Message, command: CommandObject):
 
 @router.message(Command("report_food"))
 async def report_shashlik(message: Message, command: CommandObject):
-    # args = command.args
-    # if not isinstance(args, str):
-    #     await message.answer("Вы не передали ни одного аргумента")
+    args = command.args
+    if not isinstance(args, str):
+        await message.answer("Вы не передали ни одного аргумента")
 
-    # if args.isdigit():
-    #     if args
-    today = datetime.today().replace(hour=0, minute=0, second=0, microsecond=0)
-    tomorrow = today + timedelta(days=1)
-    file_path = f"reports/report_food{today:%Y%m%d}.xlsx"
+    if args is not None:
+        try:
+            start_day, end_day = command.args.split()
+            file_path = f"reports/report_{start_day} {end_day}.xlsx"
+            start_day_time = datetime.strptime(start_day, "%d.%m.%Y")
+            end_day_time = datetime.strptime(end_day, "%d.%m.%Y")
 
-    orders_dt: dict = await create_food_report(today, tomorrow, ["Баранина", "Утка", "Крылочка", "Люля", "Ребра", "Антерекот"])
+            orders_dt = await create_food_report(start_day_time, end_day_time, ["Баранина", "Утка", "Крылочка", "Люля", "Ребра", "Антерекот", "Говядина"])
+        except:
+            await message.answer("Ошибка")
+            return
+    else:
+        today = datetime.today().replace(hour=0, minute=0, second=0, microsecond=0)
+        tomorrow = today + timedelta(days=1)
+
+        file_path = f"reports/report_food{today:%Y%m%d}.xlsx"
+
+        orders_dt: dict = await create_food_report(today, tomorrow, ["Баранина", "Утка", "Крылочка", "Люля", "Ребра", "Антерекот", "Говядина"])
 
     orders_dt["Итого"] = {
         "Сумма": sum([value["Сумма"] for value in orders_dt.values()]),
@@ -160,18 +171,28 @@ async def report_shashlik(message: Message, command: CommandObject):
 
 
 @router.message(Command("report_food2"))
-async def report_shashlik(message: Message, command: CommandObject):
-    # args = command.args
-    # if not isinstance(args, str):
-    #     await message.answer("Вы не передали ни одного аргумента")
+async def report_lagman(message: Message, command: CommandObject):
+    args = command.args
+    if not isinstance(args, str):
+        await message.answer("Вы не передали ни одного аргумента")
 
-    # if args.isdigit():
-    #     if args
-    today = datetime.today().replace(hour=0, minute=0, second=0, microsecond=0)
-    tomorrow = today + timedelta(days=1)
-    file_path = f"reports/report_food{today:%Y%m%d}.xlsx"
+    if args is not None:
+        try:
+            start_day, end_day = command.args.split()
+            file_path = f"reports/report_{start_day} {end_day}.xlsx"
+            start_day_time = datetime.strptime(start_day, "%d.%m.%Y")
+            end_day_time = datetime.strptime(end_day, "%d.%m.%Y")
 
-    orders_dt: dict = await create_food_report(today, tomorrow, filter_for_lagman)
+            orders_dt = await create_food_report(start_day_time, end_day_time, filter_for_lagman)
+        except:
+            await message.answer("Ошибка")
+            return
+    else:
+        today = datetime.today().replace(hour=0, minute=0, second=0, microsecond=0)
+        tomorrow = today + timedelta(days=1)
+        file_path = f"reports/report_food{today:%Y%m%d}.xlsx"
+
+        orders_dt: dict = await create_food_report(today, tomorrow, food_names=filter_for_lagman)
 
     orders_dt["Итого"] = {
         "Сумма": sum([value["Сумма"] for value in orders_dt.values()]),

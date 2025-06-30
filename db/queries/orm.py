@@ -87,7 +87,7 @@ async def create_food_report(today: datetime, tomorrow: datetime, food_names: li
             .where(
                 OrderFoodORM.created_at >= today,
                 OrderFoodORM.created_at < tomorrow,
-                FoodsORM.food.in_(food_names)
+                OrderFoodORM.foods.any(FoodsORM.food.in_(food_names))
             )
             .order_by(OrderFoodORM.table_id)
         )
@@ -105,7 +105,7 @@ async def create_food_report(today: datetime, tomorrow: datetime, food_names: li
                 "Заказ": ", ".join([f"{food.food} * {food.count}" for food in filtered_foods]),
                 "Дата создания": order.created_at,
                 "Сумма": sum(food.price_per_unit * food.count for food in filtered_foods),
-                "Доля шашлычника": sum(200 * food.count for food in filtered_foods),
+                "Доля по 200": sum(200 * food.count for food in filtered_foods),
             }
 
         return orders_dt
