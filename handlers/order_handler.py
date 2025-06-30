@@ -241,8 +241,8 @@ async def food_type(message: Message, state: FSMContext):
 
         msg_shashlik_id = 0
         msg_lagman_id = 0
-        foods_with_price = fill_foods_with_prices(foods)
-        order_text = await format_order_text_with_price(table_id, foods_with_price, full_name=f_name)
+        foods_with_price = await fill_foods_with_prices(foods)
+        order_text = format_order_text_with_price(table_id, foods_with_price, full_name=f_name)
 
         # Выбираем имя или фамилию работника (выбираем не None)
         waiter_name = message.from_user.first_name or message.from_user.last_name
