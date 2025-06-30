@@ -83,7 +83,8 @@ def choose_food_type():
         ],
         [
             KeyboardButton(text="Шашлык 🍢"),
-            KeyboardButton(text="Лагман 🍜")
+            KeyboardButton(text="Лагман 🍜"),
+            KeyboardButton(text="Пиво 🍺"),
         ],
         [
             KeyboardButton(text="Горячие Блюда 🐦‍🔥"),
@@ -93,7 +94,7 @@ def choose_food_type():
         [
 
             KeyboardButton(text="Напитки 🥤"),
-            KeyboardButton(text="Пиво 🍺"),
+            KeyboardButton(text="Чипсы"),
             KeyboardButton(text="Закуски 🍟")
 
         ],
@@ -275,6 +276,28 @@ def choose_bear():
         [
             KeyboardButton(text="Гусь"),
             KeyboardButton(text="Carlsberg"),
+        ]
+    ]
+
+    keyboard = ReplyKeyboardMarkup(keyboard=kb)
+    return keyboard
+
+
+def choose_chips():
+    kb = [
+        [
+            KeyboardButton(text="Лейс лук"),
+            KeyboardButton(text="Лейс сыр"),
+            KeyboardButton(text="Фан"),
+        ],
+        [
+            KeyboardButton(text="Кириешки"),
+            KeyboardButton(text="Кириешки лайт"),
+            KeyboardButton(text="Багет"),
+        ],
+        [
+            KeyboardButton(text="Арахис"),
+            KeyboardButton(text="Арахис лайт"),
         ]
     ]
 
