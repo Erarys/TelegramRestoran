@@ -97,7 +97,20 @@ def format_order_text(table_id: str, foods: dict, full_name="") -> str:
     return f"<b>Стол:</b> {table_id}\nОфициант: {full_name}\n\n{text}"
 
 def format_order_text_with_price(table_id: str, foods: dict, full_name="") -> str:
-    pass
+    lines = [f"<b>Стол:</b> {table_id}", f"<b>Официант:</b> {full_name}", ""]
+
+    bill_sum = 0
+    for name, food_info in foods.items():
+        count = food_info.get("count", 0)
+        price = food_info.get("price", 0)
+        summary = count * price
+        bill_sum += summary
+
+        lines.append(f"• {name}: <i>{count}x{price}</i> = {summary}тг")
+
+    lines.append(f"\n<b>Итого:</b> {bill_sum}тг")
+    return "\n".join(lines)
+
 
 
 def get_diff(new: dict, old: dict) -> dict:
@@ -227,7 +240,7 @@ async def food_type(message: Message, state: FSMContext):
         msg_shashlik_id = 0
         msg_lagman_id = 0
 
-        order_text = format_order_text(table_id, foods, full_name=f_name)
+        order_text = format_order_text_with_price(table_id, foods, full_name=f_name)
 
         # Выбираем имя или фамилию работника (выбираем не None)
         waiter_name = message.from_user.first_name or message.from_user.last_name
@@ -238,6 +251,7 @@ async def food_type(message: Message, state: FSMContext):
             foods_from_db = await get_table_foods(table_id)
 
             text = get_diff(foods, foods_from_db)
+
             msg = await message.bot.send_message(
                 -4773383218,
                 text=f"{order_text}\n\nПохоже официант изменил меню👀 \n{text}\n\nСтатус заказа: Не готов",
