@@ -169,6 +169,7 @@ def choose_dishes_food():
         ],
         [
             KeyboardButton(text="Фри с мясом"),
+            KeyboardButton(text="Пюре"),
         ]
 
     ]
