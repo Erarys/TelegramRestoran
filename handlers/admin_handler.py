@@ -332,6 +332,7 @@ async def auto_fill(message: Message):
         "Добрый Крепкое": 800,
         "Yang": 800,
         "Flash": 600,
+        "Водка 100мл": 700,
 
 
 

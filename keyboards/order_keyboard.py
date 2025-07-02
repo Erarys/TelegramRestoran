@@ -241,6 +241,7 @@ def choose_drinks():
         [
             KeyboardButton(text="Fanta 1л"),
             KeyboardButton(text="Чай"),
+            KeyboardButton(text="Flash"),
         ],
         [
             KeyboardButton(text="Детский сок"),
@@ -274,6 +275,7 @@ def choose_bear():
     kb = [
         [
             KeyboardButton(text="Прага"),
+            KeyboardButton(text="Водка 100мл"),
         ],
         [
             KeyboardButton(text="Гусь"),
