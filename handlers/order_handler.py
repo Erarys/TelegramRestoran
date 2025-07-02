@@ -167,7 +167,11 @@ async def table_action(callback: CallbackQuery, callback_data: TableCallback, st
     table_id = callback_data.table_id
     if callback_data.action == "clear":
         await clear_table(table_id)
-        await state.set_state(OrderForm.table_id)
+        # await state.set_state(OrderForm.table_id)
+
+        await state.update_data(table_id=table_id)
+        await callback.message.answer(text="<b>Выберите категорию</b>", reply_markup=choose_food_type())
+        await state.set_state(OrderForm.food_type)
 
     elif callback_data.action == "edit":
         foods = await get_table_foods(table_id)
