@@ -234,10 +234,12 @@ def choose_drinks():
     kb = [
         [
             KeyboardButton(text="Coca-Cola 2л"),
-            KeyboardButton(text="Fanta 1л"),
+            KeyboardButton(text="Coca-Cola 1л"),
+            KeyboardButton(text="Coca-Cola 1.5л"),
+
         ],
         [
-            KeyboardButton(text="Coca-Cola 1л"),
+            KeyboardButton(text="Fanta 1л"),
             KeyboardButton(text="Чай"),
         ],
         [
@@ -272,11 +274,21 @@ def choose_bear():
     kb = [
         [
             KeyboardButton(text="Прага"),
+            KeyboardButton(text="Гусь"),
             KeyboardButton(text="Гусь Экспортное"),
+            KeyboardButton(text="Гусь Крепкое"),
         ],
         [
-            KeyboardButton(text="Гусь"),
             KeyboardButton(text="Carlsberg"),
+            KeyboardButton(text="Holsten Pilsener"),
+            KeyboardButton(text="Holsten Light"),
+            KeyboardButton(text="Yang"),
+        ],
+        [
+            KeyboardButton(text="Garage Lemon"),
+            KeyboardButton(text="Garage Cherry"),
+            KeyboardButton(text="Добрый Бобр"),
+            KeyboardButton(text="Добрый Крепкое"),
         ]
     ]
 

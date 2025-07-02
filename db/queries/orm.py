@@ -228,6 +228,7 @@ async def fill_food_menu(name, price):
             if food is None:
                 session.add(MenuORM(food_name=name, price=price))
             else:
+                food.price = price
                 return True
 
 
