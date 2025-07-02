@@ -110,7 +110,6 @@ def choose_shashlik_food():
         [
             KeyboardButton(text="Баранина"),
             KeyboardButton(text="Утка"),
-            KeyboardButton(text="Крылочка"),
             KeyboardButton(text="Люля"),
         ],
         [
@@ -118,12 +117,13 @@ def choose_shashlik_food():
             KeyboardButton(text="Ребра"),
             KeyboardButton(text="Антрекот"),
             KeyboardButton(text="Говядина"),
-            KeyboardButton(text="Овощной"),
+
         ],
         [
-
-            KeyboardButton(text="Шампинион"),
+            KeyboardButton(text="Крылочка"),
             KeyboardButton(text="Окорачка"),
+            KeyboardButton(text="Шампинион"),
+            KeyboardButton(text="Овощной"),
         ]
 
     ]
@@ -274,6 +274,8 @@ def choose_bear():
     kb = [
         [
             KeyboardButton(text="Прага"),
+        ],
+        [
             KeyboardButton(text="Гусь"),
             KeyboardButton(text="Гусь Экспортное"),
             KeyboardButton(text="Гусь Крепкое"),
