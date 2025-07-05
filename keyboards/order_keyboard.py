@@ -241,6 +241,7 @@ def choose_drinks():
         ],
         [
             KeyboardButton(text="Fanta 1л"),
+            KeyboardButton(text="Fanta 0.5л"),
             KeyboardButton(text="Чай"),
             KeyboardButton(text="Flash"),
         ],
@@ -264,6 +265,7 @@ def choose_snacks():
         [
             KeyboardButton(text="Лепешка"),
             KeyboardButton(text="Курт"),
+            KeyboardButton(text="Чечел"),
         ]
 
     ]
@@ -316,6 +318,7 @@ def choose_chips():
         [
             KeyboardButton(text="Арахис"),
             KeyboardButton(text="Арахис лайт"),
+            KeyboardButton(text="Хрустим"),
         ]
     ]
 
