@@ -76,9 +76,12 @@ async def delete_orders(order_ids: list[int]):
         # session.commit() не нужен — уже в контексте begin
 
 
+from collections import defaultdict
+
 async def create_food_report(today: datetime, tomorrow: datetime, food_names: list[str]):
     async with factory_session() as session:
         orders_dt = dict()
+        total_sum = defaultdict(int)  # Автоматически создаёт 0 при первом обращении
 
         stmt = (
             select(OrderFoodORM)
@@ -100,6 +103,9 @@ async def create_food_report(today: datetime, tomorrow: datetime, food_names: li
             if not filtered_foods:
                 continue
 
+            for food in filtered_foods:
+                total_sum[food.food] += food.count  # просто увеличиваем
+
             orders_dt[order.id] = {
                 "Номер стола": order.table_id,
                 "Заказ": ", ".join([f"{food.food} * {food.count}" for food in filtered_foods]),
@@ -108,7 +114,8 @@ async def create_food_report(today: datetime, tomorrow: datetime, food_names: li
                 "Доля шашлычника": sum(200 * food.count for food in filtered_foods),
             }
 
-        return orders_dt
+        return orders_dt, dict(total_sum)  # Преобразуем defaultdict в обычный словарь перед возвратом
+
 
 
 

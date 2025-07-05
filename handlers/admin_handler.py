@@ -158,7 +158,7 @@ async def report_shashlik(message: Message, command: CommandObject):
             start_day_time = datetime.strptime(start_day, "%d.%m.%Y")
             end_day_time = datetime.strptime(end_day, "%d.%m.%Y")
 
-            orders_dt = await create_food_report(start_day_time, end_day_time, filter_for_shashlik)
+            orders_dt, total_sum = await create_food_report(start_day_time, end_day_time, filter_for_shashlik)
         except:
             await message.answer("Ошибка")
             return
@@ -168,7 +168,7 @@ async def report_shashlik(message: Message, command: CommandObject):
 
         file_path = f"reports/report_food{today:%Y%m%d}.xlsx"
 
-        orders_dt: dict = await create_food_report(today, tomorrow, filter_for_shashlik)
+        orders_dt, total_sum = await create_food_report(today, tomorrow, filter_for_shashlik)
 
     orders_dt["Итого"] = {
         "Сумма": sum([value["Сумма"] for value in orders_dt.values()]),
@@ -180,6 +180,7 @@ async def report_shashlik(message: Message, command: CommandObject):
 
     document = FSInputFile(file_path)
     await message.bot.send_document(message.chat.id, document)
+    await message.answer(total_sum)
 
 
 @router.message(Command("report_food2"))
@@ -195,7 +196,7 @@ async def report_lagman(message: Message, command: CommandObject):
             start_day_time = datetime.strptime(start_day, "%d.%m.%Y")
             end_day_time = datetime.strptime(end_day, "%d.%m.%Y")
 
-            orders_dt = await create_food_report(start_day_time, end_day_time, filter_for_lagman)
+            orders_dt, total_sum = await create_food_report(start_day_time, end_day_time, filter_for_lagman)
         except:
             await message.answer("Ошибка")
             return
@@ -204,7 +205,7 @@ async def report_lagman(message: Message, command: CommandObject):
         tomorrow = today + timedelta(days=1)
         file_path = f"reports/report_food{today:%Y%m%d}.xlsx"
 
-        orders_dt: dict = await create_food_report(today, tomorrow, food_names=filter_for_lagman)
+        orders_dt, total_sum = await create_food_report(today, tomorrow, food_names=filter_for_lagman)
 
     orders_dt["Итого"] = {
         "Сумма": sum([value["Сумма"] for value in orders_dt.values()]),
@@ -216,6 +217,7 @@ async def report_lagman(message: Message, command: CommandObject):
 
     document = FSInputFile(file_path)
     await message.bot.send_document(message.chat.id, document)
+    await message.answer(total_sum)
 
 @router.message(Command("add_table"))
 async def restart_order(message: Message, command: CommandObject):
