@@ -180,7 +180,7 @@ async def report_shashlik(message: Message, command: CommandObject):
 
     document = FSInputFile(file_path)
     await message.bot.send_document(message.chat.id, document)
-    await message.answer(total_sum)
+    await message.answer("\n".join([f"{name}: {count}" for name, count in total_sum.items()]))
 
 
 @router.message(Command("report_food2"))
@@ -217,7 +217,7 @@ async def report_lagman(message: Message, command: CommandObject):
 
     document = FSInputFile(file_path)
     await message.bot.send_document(message.chat.id, document)
-    await message.answer(total_sum)
+    await message.answer("\n".join([f"{name}: {count}" for name, count in total_sum.items()]))
 
 @router.message(Command("add_table"))
 async def restart_order(message: Message, command: CommandObject):
