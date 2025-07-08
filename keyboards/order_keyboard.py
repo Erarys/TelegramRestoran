@@ -242,12 +242,13 @@ def choose_drinks():
         [
             KeyboardButton(text="Fanta 1л"),
             KeyboardButton(text="Fanta 0.5л"),
-            KeyboardButton(text="Чай"),
+            KeyboardButton(text="Fanta 1.5л"),
             KeyboardButton(text="Flash"),
         ],
         [
             KeyboardButton(text="Детский сок"),
             KeyboardButton(text="Turan Вода"),
+            KeyboardButton(text="Чай"),
         ]
 
     ]

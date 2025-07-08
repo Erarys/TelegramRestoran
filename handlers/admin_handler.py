@@ -314,6 +314,7 @@ async def auto_fill(message: Message):
         "Ачучук": 2000,
         "Coca-Cola 2л": 1000,
         "Coca-Cola 1.5л": 800,
+        "Fanta 1.5л": 800,
         "Fanta 1л": 700,
         "Coca-Cola 1л": 700,
         "Чай": 350,
