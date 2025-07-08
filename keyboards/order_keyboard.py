@@ -280,6 +280,7 @@ def choose_bear():
         [
             KeyboardButton(text="Прага"),
             KeyboardButton(text="Водка 100мл"),
+            KeyboardButton(text="Жигули"),
         ],
         [
             KeyboardButton(text="Гусь"),
