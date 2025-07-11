@@ -308,14 +308,14 @@ def choose_bear():
 def choose_chips():
     kb = [
         [
-            KeyboardButton(text="Лейс лук"),
+            KeyboardButton(text="Смак"),
             KeyboardButton(text="Лейс сыр"),
             KeyboardButton(text="Фан"),
         ],
         [
             KeyboardButton(text="Кириешки"),
             KeyboardButton(text="Кириешки лайт"),
-            KeyboardButton(text="Багет"),
+            KeyboardButton(text="Кольца"),
         ],
         [
             KeyboardButton(text="Арахис"),
